@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "Cookie Guard",
+  "version": "1.0",
+  "description": "Control cookies and protect your privacy",
+  "permissions": ["cookies", "storage", "activeTab",  "storage",
+    "activeTab",
+    "tabs",
+    "http://*/*",
+    "https://*/*"],
+    "optional_permissions": ["<all_urls>"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+    
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js","readability.js"],
+      "run_at": "document_end"
+      
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["cookie_prediction_map.json"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "options_page": "popup/options.html"
+  
+
+}
+
+
+

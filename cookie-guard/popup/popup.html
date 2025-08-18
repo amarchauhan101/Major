@@ -1,0 +1,73 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Cookie Guard</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Cookie Guard</h1>
+    <div class="controls">
+      <button id="scanBtn">Scan Current Page</button>
+      <button id="settingsBtn">Settings</button>
+    </div>
+    <div class="cookie-list" id="cookieList">
+      <p>Click "Scan Current Page" to analyze cookies</p>
+    </div>
+    <div class="actions">
+      <button id="acceptEssential">Accept Essential Only</button>
+      <button id="acceptAll">Accept All</button>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Cookie Guard</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Cookie Guard</h1>
+      <div class="controls">
+        <button id="scanBtn">Scan Current Page</button>
+        <button id="settingsBtn">Settings</button>
+      </div>
+      <div class="cookie-list" id="cookieList">
+        <p>Click "Scan Current Page" to analyze cookies</p>
+      </div>
+      <div class="actions">
+        <button id="acceptEssential">Accept Essential Only</button>
+        <button id="acceptAll">Accept All</button>
+      </div>
+      <!-- popup.html -->
+      <div class="section" id="terms-section" style="display: none">
+        <h3>Terms Summary</h3>
+        <div id="terms-summary">Generating summary...</div>
+        <div class="actions">
+          <button id="accept-terms">Accept</button>
+          <button id="reject-terms">Reject</button>
+        </div>
+      </div>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html>
+<head><title>Test Popup</title></head>
+<body>
+  <h2>Test Popup</h2>
+  <script>
+    chrome.runtime.sendMessage({ action: "ping" }, (res) => {
+      console.log("Response:", res);
+    });
+  </script>
+</body>
+</html> -->

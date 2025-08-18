@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 350px;
+      padding: 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      margin: 0;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .logo {
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+    
+    h1 {
+      font-size: 1.5em;
+      margin: 0;
+      font-weight: 600;
+    }
+    
+    .section {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .input-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      font-size: 0.9em;
+    }
+    
+    input[type="password"], select {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.9);
+      box-sizing: border-box;
+      font-size: 0.9em;
+    }
+    
+    button {
+      width: 100%;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 10px;
+    }
+    
+    button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+    }
+    
+    .status {
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+      text-align: center;
+      font-size: 0.9em;
+    }
+    
+    .status.success {
+      background: rgba(76, 175, 80, 0.3);
+      border: 1px solid rgba(76, 175, 80, 0.5);
+    }
+    
+    .status.error {
+      background: rgba(244, 67, 54, 0.3);
+      border: 1px solid rgba(244, 67, 54, 0.5);
+    }
+    
+    .info {
+      font-size: 0.8em;
+      opacity: 0.9;
+      line-height: 1.4;
+    }
+    
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      text-align: center;
+    }
+    
+    .stat-item {
+      flex: 1;
+    }
+    
+    .stat-number {
+      font-size: 1.5em;
+      font-weight: bold;
+      display: block;
+    }
+    
+    .stat-label {
+      font-size: 0.8em;
+      opacity: 0.8;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+      margin-left: 10px;
+    }
+    
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.3);
+      transition: .4s;
+      border-radius: 24px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background-color: rgba(76, 175, 80, 0.8);
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">📋</div>
+    <h1>Terms AI Summarizer</h1>
+  </div>
+  
+  <div class="section">
+    <div class="input-group">
+      <label for="api-key">OpenAI API Key:</label>
+      <input type="password" id="api-key" placeholder="hf-...">
+    </div>
+    <button id="save-key">Save API Key</button>
+    <div class="info">
+      Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank" style="color: #fff;">OpenAI Platform</a>
+    </div>
+  </div>
+  
+  <div class="section">
+    <label>
+      Auto-detect Terms & Conditions
+      <label class="toggle-switch">
+        <input type="checkbox" id="auto-detect" checked>
+        <span class="slider"></span>
+      </label>
+    </label>
+    
+    <div class="input-group" style="margin-top: 15px;">
+      <label for="default-language">Default Language:</label>
+      <select id="default-language">
+        <option value="en">English</option>
+        <option value="es">Español</option>
+        <option value="fr">Français</option>
+        <option value="de">Deutsch</option>
+        <option value="hi">हिन्दी</option>
+        <option value="zh">中文</option>
+        <option value="ja">日本語</option>
+        <option value="ar">العربية</option>
+      </select>
+    </div>
+  </div>
+  
+  <div class="section">
+    <h3 style="margin-top: 0;">Statistics</h3>
+    <div class="stats">
+      <div class="stat-item">
+        <span class="stat-number" id="terms-analyzed">0</span>
+        <span class="stat-label">Analyzed</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" id="risks-found">0</span>
+        <span class="stat-label">Risks Found</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" id="time-saved">0</span>
+        <span class="stat-label">Hours Saved</span>
+      </div>
+    </div>
+  </div>
+  
+  <button id="scan-current-page">🔍 Scan Current Page</button>
+  <button id="clear-data">🗑️ Clear All Data</button>
+  
+  <div id="status"></div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
