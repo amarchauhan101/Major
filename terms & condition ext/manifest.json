@@ -1,0 +1,57 @@
+{
+  "manifest_version": 3,
+  "name": "AI Terms Summarizer Pro",
+  "version": "3.0.0",
+  "description": "Advanced AI-powered Terms & Conditions analyzer with multi-language support, risk assessment, privacy focus, and smart caching",
+  
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting",
+    "notifications",
+    "contextMenus",
+    "alarms"
+  ],
+  
+  "host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ],
+  
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "utils/detector.js",
+        "utils/textProcessor.js",
+        "utils/cache.js",
+        "content.js"
+      ],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "AI Terms Summarizer Pro - Click to configure"
+  },
+  
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "styles.css",
+        "icons/*.png",
+        "icons/*.svg"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
+  
+  
+}
