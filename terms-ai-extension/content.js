@@ -178,9 +178,17 @@ class TermsDetector {
           this.isProcessing = false;
           if (chrome.runtime.lastError) {
             console.error("Error sending message:", chrome.runtime.lastError);
-            this.showSummaryModal(
-              "❌ Error connecting to AI service. Please check your API key."
-            );
+            this.showSummaryModal(`
+              <div class="summary-section">
+                <h4>❌ Connection Error</h4>
+                <p>Unable to connect to the AI service. This might be because:</p>
+                <ul>
+                  <li>Your Hugging Face API token is not set up</li>
+                  <li>There's a network connectivity issue</li>
+                </ul>
+                <p>Please check your API token in the extension popup and try again.</p>
+              </div>
+            `);
           }
         }
       );

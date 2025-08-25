@@ -3,7 +3,7 @@
   "manifest_version": 3,
   "name": "Terms & Conditions AI Summarizer",
   "version": "1.0",
-  "description": "Automatically detects and summarizes Terms & Conditions using AI",
+  "description": "Automatically detects and summarizes Terms & Conditions using Hugging Face AI",
   
   "permissions": [
     "activeTab",

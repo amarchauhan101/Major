@@ -1,157 +1,18 @@
-// console.log("📡 Content script injected on", window.location.href);
-
-// setTimeout(() => {
-//   // Trigger cookie scan
-//   chrome.runtime.sendMessage({
-//     action: "scanCookies",
-//     url: window.location.href,
-//   });
-
-//   // Extract terms text (simple example)
-//   const termsText =
-//     document.body.innerText
-//       .split("\n")
-//       .find(
-//         (t) =>
-//           t.toLowerCase().includes("terms") ||
-//           t.toLowerCase().includes("privacy")
-//       ) || "Sample fallback text";
-
-//   chrome.runtime.sendMessage({
-//     action: "summarizeTerms",
-//     text: termsText,
-//   });
-// }, 4000); // ⏳ Delay increased to give popup time to load
-
-
-// // content-script.js
-// function detectTermsPage() {
-//   const termsKeywords = ['terms', 'conditions', 'agreement', 't&c', 'toc'];
-//   const selectors = [
-//     'a[href*="terms"]',
-//     'a[href*="conditions"]',
-//     'a[href*="agreement"]',
-//     'a:contains("Terms")',
-//     'a:contains("Conditions")'
-//   ];
-
-//   // Check common links
-//   for (const selector of selectors) {
-//     const links = Array.from(document.querySelectorAll(selector));
-//     const termsLink = links.find(link => 
-//       termsKeywords.some(kw => 
-//         link.innerText.toLowerCase().includes(kw) || 
-//         link.href.toLowerCase().includes(kw)
-//       )
-//     );
-    
-//     if (termsLink) return termsLink.href;
-//   }
-  
-//   // Check meta tags as fallback
-//   const metaTerms = document.querySelector('meta[name="terms" i], meta[name="t&c" i]');
-//   return metaTerms ? metaTerms.content : null;
-// }
-
-// // Send to background script when page loads
-// chrome.runtime.sendMessage({
-//   type: "CHECK_TERMS_PAGE",
-//   url: window.location.href,
-//   termsUrl: detectTermsPage()
-// });
-
-// setTimeout(() => {
-
-//   chrome.runtime.sendMessage({
-//     action: "scanCookies",
-//     url: window.location.href
-//   });
-
-//   const termsText = `
-//     These terms describe how your data is collected, stored, and shared.
-//     Please read them carefully before accepting.
-//   `;
-
-//   fetch("http://127.0.0.1:5001/summarize", {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json"
-//     },
-//     body: JSON.stringify({ text: termsText })
-//   })
-//     .then((res) => res.json())
-//     .then((data) => {
-//       console.log("📄 Summary from AI:", data.summary);
-
-//       // Optionally show in popup or content
-//       const div = document.createElement("div");
-//       div.style.cssText = "position:fixed;bottom:10px;right:10px;background:#fff;padding:10px;z-index:9999;border:1px solid #ccc;";
-//       div.innerText = "🔍 Summary: " + data.summary;
-//       document.body.appendChild(div);
-//     })
-//     .catch((err) => console.error("❌ Error summarizing terms:", err));
-// }, 2000);
-
-
-
-// console.log("📡 Content script injected on", window.location.href);
-
-// // Detect terms page on load
-// function detectTermsPage() {
-//   const termsKeywords = ['terms', 'conditions', 'agreement', 't&c', 'toc'];
-//   const selectors = [
-//     'a[href*="terms"]',
-//     'a[href*="conditions"]',
-//     'a[href*="agreement"]',
-//     'a:contains("Terms")',
-//     'a:contains("Conditions")'
-//   ];
-
-//   // Check common links
-//   for (const selector of selectors) {
-//     const links = Array.from(document.querySelectorAll(selector));
-//     const termsLink = links.find(link => 
-//       termsKeywords.some(kw => 
-//         link.innerText.toLowerCase().includes(kw) || 
-//         link.href.toLowerCase().includes(kw)
-//       )
-//     );
-    
-//     if (termsLink) return termsLink.href;
-//   }
-  
-//   // Check meta tags as fallback
-//   const metaTerms = document.querySelector('meta[name="terms" i], meta[name="t&c" i]');
-//   return metaTerms ? metaTerms.content : null;
-// }
-
-// // Send to background script when page loads
-// setTimeout(() => {
-//   const termsUrl = detectTermsPage();
-//   if (termsUrl) {
-//     chrome.runtime.sendMessage({
-//       type: "CHECK_TERMS_PAGE",
-//       url: window.location.href,
-//       termsUrl
-//     });
-//   }
-  
-//   // Trigger cookie scan
-//   chrome.runtime.sendMessage({
-//     action: "scanCookies",
-//     url: window.location.href,
-//   });
-// }, 2000); // ⏳ Delay to allow page to load
-
-
-
 console.log("📡 Content script injected on", window.location.href);
 
 class TermsExtractor {
   constructor() {
     this.termsKeywords = [
-      'terms', 'conditions', 'policy', 'privacy', 'legal', 'agreement',
-      'disclaimer', 'terms of service', 'terms of use', 'user agreement'
+      "terms",
+      "conditions",
+      "policy",
+      "privacy",
+      "legal",
+      "agreement",
+      "disclaimer",
+      "terms of service",
+      "terms of use",
+      "user agreement",
     ];
   }
 
@@ -159,15 +20,28 @@ class TermsExtractor {
   findTermsAndConditions() {
     const selectors = [
       // Direct selectors
-      '[class*="terms" i]', '[class*="policy" i]', '[class*="legal" i]',
-      '[id*="terms" i]', '[id*="policy" i]', '[id*="legal" i]',
-      
+      '[class*="terms" i]',
+      '[class*="policy" i]',
+      '[class*="legal" i]',
+      '[id*="terms" i]',
+      '[id*="policy" i]',
+      '[id*="legal" i]',
+
       // Content areas
-      'main', '.content', '#content', '.main-content', '.page-content',
-      '.legal-content', '.terms-content', '.policy-content',
-      
+      "main",
+      ".content",
+      "#content",
+      ".main-content",
+      ".page-content",
+      ".legal-content",
+      ".terms-content",
+      ".policy-content",
+
       // Common wrapper classes
-      '.container', '.wrapper', '.inner', '.text-content'
+      ".container",
+      ".wrapper",
+      ".inner",
+      ".text-content",
     ];
 
     let bestMatch = null;
@@ -175,11 +49,11 @@ class TermsExtractor {
 
     for (const selector of selectors) {
       const elements = document.querySelectorAll(selector);
-      
+
       for (const element of elements) {
-        const text = element.innerText || element.textContent || '';
+        const text = element.innerText || element.textContent || "";
         const score = this.scoreTermsContent(text, element);
-        
+
         if (score > maxScore && text.length > 500) {
           maxScore = score;
           bestMatch = { element, text, score };
@@ -194,10 +68,10 @@ class TermsExtractor {
   scoreTermsContent(text, element) {
     let score = 0;
     const textLower = text.toLowerCase();
-    
+
     // Check for terms keywords
-    this.termsKeywords.forEach(keyword => {
-      const regex = new RegExp(keyword, 'gi');
+    this.termsKeywords.forEach((keyword) => {
+      const regex = new RegExp(keyword, "gi");
       const matches = textLower.match(regex);
       if (matches) {
         score += matches.length * 10;
@@ -213,10 +87,10 @@ class TermsExtractor {
       /\bcookies?\b/gi,
       /\bdata protection\b/gi,
       /\bprivacy rights\b/gi,
-      /\bterms.{0,10}conditions\b/gi
+      /\bterms.{0,10}conditions\b/gi,
     ];
 
-    legalPatterns.forEach(pattern => {
+    legalPatterns.forEach((pattern) => {
       const matches = text.match(pattern);
       if (matches) {
         score += matches.length * 5;
@@ -224,9 +98,9 @@ class TermsExtractor {
     });
 
     // Bonus for structure
-    if (element.tagName === 'MAIN') score += 20;
-    if (element.className.toLowerCase().includes('content')) score += 15;
-    if (element.id.toLowerCase().includes('content')) score += 15;
+    if (element.tagName === "MAIN") score += 20;
+    if (element.className.toLowerCase().includes("content")) score += 15;
+    if (element.id.toLowerCase().includes("content")) score += 15;
 
     // Length bonus (but cap it)
     score += Math.min(text.length / 100, 50);
@@ -240,28 +114,31 @@ class TermsExtractor {
       title: document.title,
       url: window.location.href,
       domain: window.location.hostname,
-      language: document.documentElement.lang || 
-                document.querySelector('meta[http-equiv="content-language"]')?.content ||
-                navigator.language.split('-')[0] || 'en'
+      language:
+        document.documentElement.lang ||
+        document.querySelector('meta[http-equiv="content-language"]')
+          ?.content ||
+        navigator.language.split("-")[0] ||
+        "en",
     };
 
     // Look for terms-specific page indicators
     const indicators = {
       isTermsPage: false,
       isPrivacyPage: false,
-      isLegalPage: false
+      isLegalPage: false,
     };
 
     const url = window.location.href.toLowerCase();
     const title = document.title.toLowerCase();
 
-    if (url.includes('terms') || title.includes('terms')) {
+    if (url.includes("terms") || title.includes("terms")) {
       indicators.isTermsPage = true;
     }
-    if (url.includes('privacy') || title.includes('privacy')) {
+    if (url.includes("privacy") || title.includes("privacy")) {
       indicators.isPrivacyPage = true;
     }
-    if (url.includes('legal') || title.includes('legal')) {
+    if (url.includes("legal") || title.includes("legal")) {
       indicators.isLegalPage = true;
     }
 
@@ -271,21 +148,34 @@ class TermsExtractor {
   // Get user's preferred language from browser
   getUserLanguage() {
     // Check localStorage for saved preference
-    const savedLang = localStorage.getItem('cookieGuard_language');
+    const savedLang = localStorage.getItem("cookieGuard_language");
     if (savedLang) return savedLang;
 
     // Get from browser
-    const browserLang = navigator.language.split('-')[0];
-    
+    const browserLang = navigator.language.split("-")[0];
+
     // Supported languages mapping
     const supportedLanguages = {
-      'en': 'en', 'es': 'es', 'fr': 'fr', 'de': 'de', 'it': 'it',
-      'pt': 'pt', 'ru': 'ru', 'ja': 'ja', 'ko': 'ko', 'zh': 'zh',
-      'ar': 'ar', 'hi': 'hi', 'mr': 'mr', 'te': 'te', 'ta': 'ta',
-      'bn': 'bn', 'gu': 'gu'
+      en: "en",
+      es: "es",
+      fr: "fr",
+      de: "de",
+      it: "it",
+      pt: "pt",
+      ru: "ru",
+      ja: "ja",
+      ko: "ko",
+      zh: "zh",
+      ar: "ar",
+      hi: "hi",
+      mr: "mr",
+      te: "te",
+      ta: "ta",
+      bn: "bn",
+      gu: "gu",
     };
 
-    return supportedLanguages[browserLang] || 'en';
+    return supportedLanguages[browserLang] || "en";
   }
 }
 
@@ -295,7 +185,7 @@ const termsExtractor = new TermsExtractor();
 // Wait for page to load, then extract and analyze
 setTimeout(() => {
   console.log("🔍 Starting cookie and terms analysis...");
-  
+
   // 1. Trigger cookie scan (existing functionality)
   chrome.runtime.sendMessage({
     action: "scanCookies",
@@ -305,15 +195,15 @@ setTimeout(() => {
   // 2. Extract and analyze terms & conditions
   const pageMetadata = termsExtractor.extractPageMetadata();
   const userLanguage = termsExtractor.getUserLanguage();
-  
+
   console.log("📄 Page metadata:", pageMetadata);
   console.log("🌍 User language:", userLanguage);
 
   let termsText = "";
-  
+
   // Try to find terms content on current page
   const termsMatch = termsExtractor.findTermsAndConditions();
-  
+
   if (termsMatch) {
     console.log("✅ Found terms content with score:", termsMatch.score);
     termsText = termsMatch.text;
@@ -326,7 +216,7 @@ setTimeout(() => {
       chrome.runtime.sendMessage({
         action: "extractTermsFromUrl",
         url: termsLinks[0],
-        language: userLanguage
+        language: userLanguage,
       });
       return;
     } else {
@@ -341,33 +231,37 @@ setTimeout(() => {
       action: "summarizeTerms",
       text: termsText,
       language: userLanguage,
-      metadata: pageMetadata
+      metadata: pageMetadata,
     });
   } else {
     console.log("⚠️ Insufficient terms content found");
   }
-
 }, 4000); // Delay to ensure page is fully loaded
 
 // Helper function to find terms and conditions links
 function findTermsLinks() {
-  const links = Array.from(document.querySelectorAll('a'));
+  const links = Array.from(document.querySelectorAll("a"));
   const termsLinks = [];
-  
+
   const termsPatterns = [
-    /terms/i, /conditions/i, /privacy/i, /policy/i, /legal/i,
-    /user.{0,10}agreement/i, /terms.{0,10}service/i
+    /terms/i,
+    /conditions/i,
+    /privacy/i,
+    /policy/i,
+    /legal/i,
+    /user.{0,10}agreement/i,
+    /terms.{0,10}service/i,
   ];
 
-  links.forEach(link => {
-    const href = link.getAttribute('href');
+  links.forEach((link) => {
+    const href = link.getAttribute("href");
     const text = link.textContent || link.innerText;
-    
+
     if (href && text) {
-      const matchesPattern = termsPatterns.some(pattern => 
-        pattern.test(text) || pattern.test(href)
+      const matchesPattern = termsPatterns.some(
+        (pattern) => pattern.test(text) || pattern.test(href)
       );
-      
+
       if (matchesPattern) {
         // Convert relative URLs to absolute
         const absoluteUrl = new URL(href, window.location.href).href;
@@ -380,9 +274,9 @@ function findTermsLinks() {
 }
 
 // Listen for language preference changes
-window.addEventListener('message', (event) => {
-  if (event.data.action === 'changeLanguage') {
-    localStorage.setItem('cookieGuard_language', event.data.language);
+window.addEventListener("message", (event) => {
+  if (event.data.action === "changeLanguage") {
+    localStorage.setItem("cookieGuard_language", event.data.language);
     console.log("🌍 Language preference updated:", event.data.language);
   }
 });
@@ -403,10 +297,10 @@ const cookieObserver = new MutationObserver(() => {
 });
 
 // Start observing
-cookieObserver.observe(document, { 
-  childList: true, 
-  subtree: true, 
-  attributes: true 
+cookieObserver.observe(document, {
+  childList: true,
+  subtree: true,
+  attributes: true,
 });
 
 console.log("✅ Enhanced Cookie Guard content script loaded");
@@ -418,32 +312,46 @@ class AITermsDetector {
     this.termsPatterns = {
       // Advanced pattern matching for terms detection
       exact: [
-        'terms of service', 'terms and conditions', 'privacy policy', 
-        'user agreement', 'cookie policy', 'data protection policy'
+        "terms of service",
+        "terms and conditions",
+        "privacy policy",
+        "user agreement",
+        "cookie policy",
+        "data protection policy",
       ],
       partial: [
-        'terms', 'privacy', 'conditions', 'agreement', 'policy', 
-        'legal', 'disclaimer', 'consent', 'gdpr', 'ccpa'
+        "terms",
+        "privacy",
+        "conditions",
+        "agreement",
+        "policy",
+        "legal",
+        "disclaimer",
+        "consent",
+        "gdpr",
+        "ccpa",
       ],
       legal: [
         /\b(you agree|we collect|personal information|third.{0,10}part(y|ies))\b/gi,
         /\b(data.{0,10}processing|liability|indemnif|arbitration)\b/gi,
-        /\b(intellectual.{0,10}property|copyright|trademark)\b/gi
-      ]
+        /\b(intellectual.{0,10}property|copyright|trademark)\b/gi,
+      ],
     };
-    
+
     this.aiCache = new Map();
     this.processingQueue = [];
     this.isProcessing = false;
     this.observerActive = false;
-    
+
     this.initializeAdvancedDetection();
   }
 
   initializeAdvancedDetection() {
     // Wait for DOM to be ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => this.startDetection());
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () =>
+        this.startDetection()
+      );
     } else {
       this.startDetection();
     }
@@ -462,16 +370,16 @@ class AITermsDetector {
 
   performIntelligentDetection() {
     console.log("🔍 Starting intelligent terms detection...");
-    
+
     const detectionResults = {
       termsLinks: this.findTermsLinks(),
       termsContent: this.extractTermsContent(),
       modalTerms: this.detectModalTerms(),
-      cookieBanners: this.detectCookieBanners()
+      cookieBanners: this.detectCookieBanners(),
     };
 
     const confidence = this.calculateDetectionConfidence(detectionResults);
-    
+
     if (confidence > 0.3) {
       this.triggerAIAnalysis(detectionResults, confidence);
     }
@@ -482,23 +390,27 @@ class AITermsDetector {
 
   findTermsLinks() {
     const selectors = [
-      'a[href*="terms" i]', 'a[href*="privacy" i]', 'a[href*="policy" i]',
-      'a[href*="legal" i]', 'a[href*="conditions" i]', 'a[href*="agreement" i]'
+      'a[href*="terms" i]',
+      'a[href*="privacy" i]',
+      'a[href*="policy" i]',
+      'a[href*="legal" i]',
+      'a[href*="conditions" i]',
+      'a[href*="agreement" i]',
     ];
 
     const links = [];
-    selectors.forEach(selector => {
-      document.querySelectorAll(selector).forEach(link => {
+    selectors.forEach((selector) => {
+      document.querySelectorAll(selector).forEach((link) => {
         const text = link.textContent.toLowerCase();
         const href = link.href.toLowerCase();
-        
+
         const relevanceScore = this.calculateLinkRelevance(text, href);
         if (relevanceScore > 0.5) {
           links.push({
             element: link,
             url: link.href,
             text: link.textContent,
-            score: relevanceScore
+            score: relevanceScore,
           });
         }
       });
@@ -509,16 +421,24 @@ class AITermsDetector {
 
   extractTermsContent() {
     const contentSelectors = [
-      '[class*="terms" i]', '[class*="policy" i]', '[class*="legal" i]',
-      '[id*="terms" i]', '[id*="policy" i]', '[id*="legal" i]',
-      'main', '.content', '#content', '.main-content', 'article'
+      '[class*="terms" i]',
+      '[class*="policy" i]',
+      '[class*="legal" i]',
+      '[id*="terms" i]',
+      '[id*="policy" i]',
+      '[id*="legal" i]',
+      "main",
+      ".content",
+      "#content",
+      ".main-content",
+      "article",
     ];
 
     let bestMatch = null;
     let maxScore = 0;
 
-    contentSelectors.forEach(selector => {
-      document.querySelectorAll(selector).forEach(element => {
+    contentSelectors.forEach((selector) => {
+      document.querySelectorAll(selector).forEach((element) => {
         const text = this.extractCleanText(element);
         if (text.length < 500) return;
 
@@ -529,7 +449,7 @@ class AITermsDetector {
             element,
             text,
             score,
-            wordCount: text.split(' ').length
+            wordCount: text.split(" ").length,
           };
         }
       });
@@ -540,17 +460,22 @@ class AITermsDetector {
 
   detectModalTerms() {
     const modalSelectors = [
-      '[role="dialog"]', '.modal', '.popup', '.overlay',
-      '[class*="consent" i]', '[class*="cookie" i]', '[class*="gdpr" i]'
+      '[role="dialog"]',
+      ".modal",
+      ".popup",
+      ".overlay",
+      '[class*="consent" i]',
+      '[class*="cookie" i]',
+      '[class*="gdpr" i]',
     ];
 
     const visibleModals = [];
-    modalSelectors.forEach(selector => {
-      document.querySelectorAll(selector).forEach(modal => {
+    modalSelectors.forEach((selector) => {
+      document.querySelectorAll(selector).forEach((modal) => {
         if (this.isElementVisible(modal)) {
           const text = this.extractCleanText(modal);
           const score = this.scoreContentRelevance(text, modal);
-          
+
           if (score > 0.3) {
             visibleModals.push({ element: modal, text, score });
           }
@@ -563,13 +488,16 @@ class AITermsDetector {
 
   detectCookieBanners() {
     const cookieSelectors = [
-      '[class*="cookie" i]', '[id*="cookie" i]', '[class*="consent" i]',
-      '[class*="gdpr" i]', '[class*="privacy" i]'
+      '[class*="cookie" i]',
+      '[id*="cookie" i]',
+      '[class*="consent" i]',
+      '[class*="gdpr" i]',
+      '[class*="privacy" i]',
     ];
 
     const banners = [];
-    cookieSelectors.forEach(selector => {
-      document.querySelectorAll(selector).forEach(banner => {
+    cookieSelectors.forEach((selector) => {
+      document.querySelectorAll(selector).forEach((banner) => {
         if (this.isElementVisible(banner)) {
           const text = this.extractCleanText(banner);
           if (text.length > 50 && this.containsCookieKeywords(text)) {
@@ -584,18 +512,18 @@ class AITermsDetector {
 
   calculateDetectionConfidence(results) {
     let confidence = 0;
-    
+
     // Links contribute to confidence
     confidence += Math.min(results.termsLinks.length * 0.2, 0.4);
-    
+
     // Content relevance
     if (results.termsContent) {
       confidence += Math.min(results.termsContent.score * 0.4, 0.5);
     }
-    
+
     // Modal presence
     confidence += Math.min(results.modalTerms.length * 0.15, 0.3);
-    
+
     // Cookie banners
     confidence += Math.min(results.cookieBanners.length * 0.1, 0.2);
 
@@ -606,11 +534,13 @@ class AITermsDetector {
     if (this.isProcessing) return;
     this.isProcessing = true;
 
-    console.log(`🎯 Triggering AI analysis with confidence: ${confidence.toFixed(2)}`);
+    console.log(
+      `🎯 Triggering AI analysis with confidence: ${confidence.toFixed(2)}`
+    );
 
     // Prepare text for analysis
     let analysisText = "";
-    
+
     // Prioritize content over links
     if (detectionResults.termsContent) {
       analysisText = detectionResults.termsContent.text;
@@ -626,7 +556,7 @@ class AITermsDetector {
     }
 
     // Include modal content
-    detectionResults.modalTerms.forEach(modal => {
+    detectionResults.modalTerms.forEach((modal) => {
       analysisText += "\n\n" + modal.text;
     });
 
@@ -637,7 +567,7 @@ class AITermsDetector {
         text: analysisText.substring(0, 50000), // Limit size
         language: this.getUserLanguage(),
         metadata: this.extractPageMetadata(),
-        confidence: confidence
+        confidence: confidence,
       });
     }
 
@@ -654,8 +584,8 @@ class AITermsDetector {
 
       const html = await response.text();
       const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      
+      const doc = parser.parseFromString(html, "text/html");
+
       return this.extractCleanText(doc.body);
     } catch (error) {
       return null;
@@ -667,99 +597,109 @@ class AITermsDetector {
       action: "scanCookies",
       url: window.location.href,
       enhanced: true,
-      pageMetadata: this.extractPageMetadata()
+      pageMetadata: this.extractPageMetadata(),
     });
   }
 
   // Helper methods
   extractCleanText(element) {
     if (!element) return "";
-    
+
     // Clone to avoid modifying original
     const clone = element.cloneNode(true);
-    
+
     // Remove scripts and styles
-    clone.querySelectorAll('script, style, noscript').forEach(el => el.remove());
-    
+    clone
+      .querySelectorAll("script, style, noscript")
+      .forEach((el) => el.remove());
+
     let text = clone.textContent || clone.innerText || "";
-    
+
     // Clean up whitespace
-    text = text.replace(/\s+/g, ' ').trim();
-    
+    text = text.replace(/\s+/g, " ").trim();
+
     return text;
   }
 
   scoreContentRelevance(text, element) {
     let score = 0;
     const textLower = text.toLowerCase();
-    
+
     // Check for exact patterns
-    this.termsPatterns.exact.forEach(pattern => {
+    this.termsPatterns.exact.forEach((pattern) => {
       if (textLower.includes(pattern)) score += 0.3;
     });
-    
+
     // Check for partial patterns
-    this.termsPatterns.partial.forEach(pattern => {
-      const regex = new RegExp(`\\b${pattern}\\b`, 'gi');
+    this.termsPatterns.partial.forEach((pattern) => {
+      const regex = new RegExp(`\\b${pattern}\\b`, "gi");
       const matches = textLower.match(regex);
       if (matches) score += matches.length * 0.05;
     });
-    
+
     // Check for legal patterns
-    this.termsPatterns.legal.forEach(pattern => {
+    this.termsPatterns.legal.forEach((pattern) => {
       const matches = text.match(pattern);
       if (matches) score += matches.length * 0.1;
     });
-    
+
     // Element structure bonus
     const tagName = element.tagName.toLowerCase();
-    if (['main', 'article'].includes(tagName)) score += 0.2;
-    if (['section', 'div'].includes(tagName)) score += 0.1;
-    
+    if (["main", "article"].includes(tagName)) score += 0.2;
+    if (["section", "div"].includes(tagName)) score += 0.1;
+
     // Length bonus (but capped)
     score += Math.min(text.length / 5000, 0.3);
-    
+
     return Math.min(score, 1.0);
   }
 
   calculateLinkRelevance(text, href) {
     let score = 0;
-    
-    this.termsPatterns.exact.forEach(pattern => {
+
+    this.termsPatterns.exact.forEach((pattern) => {
       if (text.includes(pattern) || href.includes(pattern)) {
         score += 0.4;
       }
     });
-    
-    this.termsPatterns.partial.forEach(pattern => {
+
+    this.termsPatterns.partial.forEach((pattern) => {
       if (text.includes(pattern) || href.includes(pattern)) {
         score += 0.1;
       }
     });
-    
+
     return Math.min(score, 1.0);
   }
 
   isElementVisible(element) {
     const rect = element.getBoundingClientRect();
     const style = window.getComputedStyle(element);
-    
+
     return (
-      rect.width > 0 && rect.height > 0 &&
-      style.display !== 'none' &&
-      style.visibility !== 'hidden' &&
-      style.opacity !== '0'
+      rect.width > 0 &&
+      rect.height > 0 &&
+      style.display !== "none" &&
+      style.visibility !== "hidden" &&
+      style.opacity !== "0"
     );
   }
 
   containsCookieKeywords(text) {
     const cookieKeywords = [
-      'cookie', 'consent', 'privacy', 'gdpr', 'ccpa', 
-      'tracking', 'analytics', 'accept', 'decline'
+      "cookie",
+      "consent",
+      "privacy",
+      "gdpr",
+      "ccpa",
+      "tracking",
+      "analytics",
+      "accept",
+      "decline",
     ];
-    
+
     const textLower = text.toLowerCase();
-    return cookieKeywords.some(keyword => textLower.includes(keyword));
+    return cookieKeywords.some((keyword) => textLower.includes(keyword));
   }
 
   extractPageMetadata() {
@@ -767,39 +707,46 @@ class AITermsDetector {
       title: document.title,
       url: window.location.href,
       domain: window.location.hostname,
-      language: document.documentElement.lang || 
-                document.querySelector('meta[http-equiv="content-language"]')?.content ||
-                navigator.language.split('-')[0] || 'en',
-      timestamp: Date.now()
+      language:
+        document.documentElement.lang ||
+        document.querySelector('meta[http-equiv="content-language"]')
+          ?.content ||
+        navigator.language.split("-")[0] ||
+        "en",
+      timestamp: Date.now(),
     };
   }
 
   getUserLanguage() {
-    const savedLang = localStorage.getItem('cookieGuard_language');
+    const savedLang = localStorage.getItem("cookieGuard_language");
     if (savedLang) return savedLang;
-    
-    return navigator.language.split('-')[0] || 'en';
+
+    return navigator.language.split("-")[0] || "en";
   }
 
   setupIntersectionObserver() {
     if (this.observerActive) return;
-    
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const element = entry.target;
-          if (element.classList.contains('terms-potential')) {
-            // Lazy load analysis for this element
-            this.analyzeElement(element);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const element = entry.target;
+            if (element.classList.contains("terms-potential")) {
+              // Lazy load analysis for this element
+              this.analyzeElement(element);
+            }
           }
-        }
-      });
-    }, { threshold: 0.1 });
+        });
+      },
+      { threshold: 0.1 }
+    );
 
     // Mark potential terms elements for lazy loading
-    document.querySelectorAll('[class*="terms"], [class*="policy"], [class*="legal"]')
-      .forEach(el => {
-        el.classList.add('terms-potential');
+    document
+      .querySelectorAll('[class*="terms"], [class*="policy"], [class*="legal"]')
+      .forEach((el) => {
+        el.classList.add("terms-potential");
         observer.observe(el);
       });
 
@@ -810,20 +757,24 @@ class AITermsDetector {
     const observer = new MutationObserver(
       this.debounce((mutations) => {
         let shouldRecheck = false;
-        
-        mutations.forEach(mutation => {
-          if (mutation.type === 'childList') {
-            mutation.addedNodes.forEach(node => {
+
+        mutations.forEach((mutation) => {
+          if (mutation.type === "childList") {
+            mutation.addedNodes.forEach((node) => {
               if (node.nodeType === Node.ELEMENT_NODE) {
-                const text = node.textContent?.toLowerCase() || '';
-                if (this.termsPatterns.partial.some(pattern => text.includes(pattern))) {
+                const text = node.textContent?.toLowerCase() || "";
+                if (
+                  this.termsPatterns.partial.some((pattern) =>
+                    text.includes(pattern)
+                  )
+                ) {
                   shouldRecheck = true;
                 }
               }
             });
           }
         });
-        
+
         if (shouldRecheck) {
           this.debouncedDetect();
         }
@@ -832,7 +783,7 @@ class AITermsDetector {
 
     observer.observe(document.body, {
       childList: true,
-      subtree: true
+      subtree: true,
     });
   }
 
@@ -852,17 +803,17 @@ class AITermsDetector {
 // Message handling for background communication
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   switch (message.action) {
-    case 'forceDetection':
+    case "forceDetection":
       new AITermsDetector();
-      sendResponse({ status: 'detection_started' });
+      sendResponse({ status: "detection_started" });
       break;
-    case 'displaySummary':
+    case "displaySummary":
       displayEnhancedSummary(message.summary, message.metadata);
-      sendResponse({ status: 'summary_displayed' });
+      sendResponse({ status: "summary_displayed" });
       break;
-    case 'showCookieReport':
+    case "showCookieReport":
       displayCookieReport(message.cookies);
-      sendResponse({ status: 'cookies_displayed' });
+      sendResponse({ status: "cookies_displayed" });
       break;
   }
   return true;
@@ -870,11 +821,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 function displayEnhancedSummary(summary, metadata) {
   // Remove existing notification/modal
-  const existing = document.querySelector('#ai-terms-overlay');
+  const existing = document.querySelector("#ai-terms-overlay");
   if (existing) existing.remove();
 
-  const overlay = document.createElement('div');
-  overlay.id = 'ai-terms-overlay';
+  const overlay = document.createElement("div");
+  overlay.id = "ai-terms-overlay";
   overlay.innerHTML = `
     <div class="ai-terms-modal">
       <div class="ai-terms-header">
@@ -906,15 +857,15 @@ function displayEnhancedSummary(summary, metadata) {
   `;
 
   // Add enhanced styles
-  if (!document.querySelector('#ai-terms-styles')) {
-    const styles = document.createElement('style');
-    styles.id = 'ai-terms-styles';
+  if (!document.querySelector("#ai-terms-styles")) {
+    const styles = document.createElement("style");
+    styles.id = "ai-terms-styles";
     styles.textContent = getEnhancedStyles();
     document.head.appendChild(styles);
   }
 
   document.body.appendChild(overlay);
-  
+
   // Add event listeners
   setupModalEventListeners();
 }
@@ -1121,33 +1072,37 @@ function getEnhancedStyles() {
 }
 
 function setupModalEventListeners() {
-  document.getElementById('close-ai-modal')?.addEventListener('click', () => {
-    document.getElementById('ai-terms-overlay')?.remove();
+  document.getElementById("close-ai-modal")?.addEventListener("click", () => {
+    document.getElementById("ai-terms-overlay")?.remove();
   });
 
-  document.getElementById('translate-summary')?.addEventListener('click', () => {
-    const language = document.getElementById('language-selector').value;
-    const content = document.getElementById('summary-content').textContent;
-    
-    chrome.runtime.sendMessage({
-      action: 'translateSummary',
-      text: content,
-      targetLanguage: language
+  document
+    .getElementById("translate-summary")
+    ?.addEventListener("click", () => {
+      const language = document.getElementById("language-selector").value;
+      const content = document.getElementById("summary-content").textContent;
+
+      chrome.runtime.sendMessage({
+        action: "translateSummary",
+        text: content,
+        targetLanguage: language,
+      });
     });
-  });
 
-  document.getElementById('detailed-analysis')?.addEventListener('click', () => {
-    chrome.runtime.sendMessage({
-      action: 'detailedAnalysis',
-      url: window.location.href
+  document
+    .getElementById("detailed-analysis")
+    ?.addEventListener("click", () => {
+      chrome.runtime.sendMessage({
+        action: "detailedAnalysis",
+        url: window.location.href,
+      });
     });
-  });
 
-  document.getElementById('export-summary')?.addEventListener('click', () => {
-    const content = document.getElementById('summary-content').textContent;
-    const blob = new Blob([content], { type: 'text/plain' });
+  document.getElementById("export-summary")?.addEventListener("click", () => {
+    const content = document.getElementById("summary-content").textContent;
+    const blob = new Blob([content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
     a.download = `terms-summary-${window.location.hostname}.txt`;
     a.click();

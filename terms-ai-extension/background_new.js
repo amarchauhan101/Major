@@ -320,7 +320,7 @@ class AITermsSummarizer {
               </div>
             </div>
 
-            <!-- Key Points Panel with Interactive Visualization -->
+            <!-- Key Points Panel -->
             <div class="insight-panel">
               <div class="panel-header">
                 <div class="panel-icon">🎯</div>
@@ -328,62 +328,15 @@ class AITermsSummarizer {
                   <h3>Key Points</h3>
                   <span class="panel-badge">${analysisResults.keyPoints.length} items</span>
                 </div>
-                <div class="panel-actions">
-                  <button class="view-toggle-btn" onclick="toggleViewMode(this, 'keypoints')">📊 Chart View</button>
-                </div>
               </div>
               <div class="panel-content">
-                <!-- Interactive Visual Overview -->
-                <div class="visual-overview">
-                  <div class="importance-distribution">
-                    <h4>📈 Importance Distribution</h4>
-                    <div class="distribution-chart">
-                      <div class="chart-segment critical" style="width: ${(analysisResults.criticalCount / analysisResults.keyPoints.length * 100)}%">
-                        <span class="segment-label">Critical (${analysisResults.criticalCount})</span>
-                      </div>
-                      <div class="chart-segment important" style="width: ${(analysisResults.importantCount / analysisResults.keyPoints.length * 100)}%">
-                        <span class="segment-label">Important (${analysisResults.importantCount})</span>
-                      </div>
-                      <div class="chart-segment normal" style="width: ${(analysisResults.normalCount / analysisResults.keyPoints.length * 100)}%">
-                        <span class="segment-label">Normal (${analysisResults.normalCount})</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <!-- Interactive Point Categories -->
-                  <div class="category-filters">
-                    <button class="filter-btn active" onclick="filterPoints('all')">🔍 All Points</button>
-                    <button class="filter-btn" onclick="filterPoints('critical')">🚨 Critical Only</button>
-                    <button class="filter-btn" onclick="filterPoints('rights')">⚖️ Your Rights</button>
-                    <button class="filter-btn" onclick="filterPoints('risks')">⚠️ Risks</button>
-                  </div>
-                </div>
-
-                <!-- Points Interactive List View -->
-                <div class="points-interactive list-view active" id="keypoints-list">
+                <div class="points-interactive">
                   ${analysisResults.keyPointsHtml}
-                </div>
-
-                <!-- Points Chart View (Hidden by default) -->
-                <div class="points-chart-view" id="keypoints-chart" style="display: none;">
-                  <div class="interactive-timeline">
-                    <h4>📍 Document Flow Analysis</h4>
-                    <div class="timeline-container">
-                      ${analysisResults.timelineHtml}
-                    </div>
-                  </div>
-                  
-                  <div class="impact-matrix">
-                    <h4>💥 Impact vs Frequency Matrix</h4>
-                    <div class="matrix-container">
-                      ${analysisResults.impactMatrixHtml}
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
 
-            <!-- Enhanced Risk Analysis Panel with Advanced Visualizations -->
+            <!-- Risk Analysis Panel -->
             <div class="insight-panel risk-panel">
               <div class="panel-header">
                 <div class="panel-icon">🛡️</div>
@@ -391,87 +344,16 @@ class AITermsSummarizer {
                   <h3>Risk Analysis</h3>
                   <span class="panel-badge risk-${analysisResults.overallRisk}">${analysisResults.overallRisk}</span>
                 </div>
-                <div class="panel-actions">
-                  <button class="view-toggle-btn" onclick="toggleViewMode(this, 'risks')">🎯 Detailed View</button>
-                </div>
               </div>
               <div class="panel-content">
-                <!-- Risk Score Visualization -->
-                <div class="risk-score-visual">
-                  <div class="score-gauge-container">
-                    <div class="gauge-wrapper">
-                      <svg class="risk-gauge" viewBox="0 0 200 120">
-                        <defs>
-                          <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" style="stop-color:#10b981"/>
-                            <stop offset="50%" style="stop-color:#f59e0b"/>
-                            <stop offset="100%" style="stop-color:#ef4444"/>
-                          </linearGradient>
-                        </defs>
-                        <path d="M 20 100 A 80 80 0 0 1 180 100" stroke="#e5e7eb" stroke-width="8" fill="none"/>
-                        <path d="M 20 100 A 80 80 0 0 1 180 100" stroke="url(#gaugeGradient)" stroke-width="8" 
-                              fill="none" stroke-dasharray="251" 
-                              stroke-dashoffset="${251 - (analysisResults.riskScore / 100) * 251}"
-                              class="gauge-progress"/>
-                        <circle cx="100" cy="100" r="4" fill="#374151"/>
-                        <line x1="100" y1="100" x2="${100 + 70 * Math.cos((analysisResults.riskScore / 100 * 180 - 180) * Math.PI / 180)}" 
-                              y2="${100 + 70 * Math.sin((analysisResults.riskScore / 100 * 180 - 180) * Math.PI / 180)}" 
-                              stroke="#374151" stroke-width="3" stroke-linecap="round"/>
-                      </svg>
-                      <div class="gauge-labels">
-                        <span class="gauge-label low">Low</span>
-                        <span class="gauge-label medium">Medium</span>
-                        <span class="gauge-label high">High</span>
-                      </div>
-                    </div>
-                    <div class="gauge-info">
-                      <div class="gauge-score">${analysisResults.riskScore}</div>
-                      <div class="gauge-description">Risk Score</div>
-                      <div class="risk-trend">
-                        <span class="trend-icon">${analysisResults.riskTrend > 0 ? '📈' : '📉'}</span>
-                        <span class="trend-text">${analysisResults.riskTrendText}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Interactive Risk Categories -->
-                <div class="risk-categories-visual">
-                  <h4>🎯 Risk Categories Breakdown</h4>
-                  <div class="category-bubbles">
-                    ${analysisResults.riskBubblesHtml}
-                  </div>
-                </div>
-
-                <!-- Traditional Risk Visualization (Enhanced) -->
-                <div class="risk-traditional-view" id="risks-simple">
-                  ${analysisResults.riskVisualizationHtml}
-                </div>
-
-                <!-- Advanced Risk Network View -->
-                <div class="risk-network-view" id="risks-detailed" style="display: none;">
-                  <div class="network-container">
-                    <h4>🔗 Risk Interconnection Network</h4>
-                    <div class="risk-network">
-                      ${analysisResults.riskNetworkHtml}
-                    </div>
-                  </div>
-                  
-                  <div class="risk-timeline">
-                    <h4>⏱️ Potential Impact Timeline</h4>
-                    <div class="timeline-risks">
-                      ${analysisResults.riskTimelineHtml}
-                    </div>
-                  </div>
-                </div>
-
+                ${analysisResults.riskVisualizationHtml}
                 <div class="risk-insights">
                   ${analysisResults.riskDetailsHtml}
                 </div>
               </div>
             </div>
 
-            <!-- Enhanced Rights & Protection Panel with Visual Elements -->
+            <!-- Rights & Protection Panel -->
             <div class="insight-panel rights-panel">
               <div class="panel-header">
                 <div class="panel-icon">⚖️</div>
@@ -479,65 +361,9 @@ class AITermsSummarizer {
                   <h3>Your Rights</h3>
                   <span class="panel-badge success">${analysisResults.rightsCount} protected</span>
                 </div>
-                <div class="panel-actions">
-                  <button class="view-toggle-btn" onclick="toggleViewMode(this, 'rights')">🎨 Visual Map</button>
-                </div>
               </div>
               <div class="panel-content">
-                <!-- Rights Protection Score -->
-                <div class="rights-score-overview">
-                  <div class="protection-meter">
-                    <h4>🛡️ Protection Level</h4>
-                    <div class="meter-container">
-                      <div class="meter-track">
-                        <div class="meter-fill" style="width: ${analysisResults.protectionScore}%"></div>
-                      </div>
-                      <div class="meter-labels">
-                        <span>Vulnerable</span>
-                        <span>Protected</span>
-                        <span>Secure</span>
-                      </div>
-                    </div>
-                    <div class="protection-score">${analysisResults.protectionScore}% Protected</div>
-                  </div>
-                  
-                  <div class="rights-summary-stats">
-                    <div class="stat-circle protected">
-                      <div class="stat-number">${analysisResults.rightsStats.protected}</div>
-                      <div class="stat-label">Protected</div>
-                    </div>
-                    <div class="stat-circle limited">
-                      <div class="stat-number">${analysisResults.rightsStats.limited}</div>
-                      <div class="stat-label">Limited</div>
-                    </div>
-                    <div class="stat-circle at-risk">
-                      <div class="stat-number">${analysisResults.rightsStats.atRisk}</div>
-                      <div class="stat-label">At Risk</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Traditional Rights Grid View -->
-                <div class="rights-grid-view" id="rights-grid">
-                  ${analysisResults.userRightsHtml}
-                </div>
-
-                <!-- Visual Rights Map View -->
-                <div class="rights-visual-map" id="rights-visual" style="display: none;">
-                  <div class="rights-ecosystem">
-                    <h4>🗺️ Your Rights Ecosystem</h4>
-                    <div class="ecosystem-diagram">
-                      ${analysisResults.rightsEcosystemHtml}
-                    </div>
-                  </div>
-                  
-                  <div class="rights-comparison">
-                    <h4>📊 Rights Strength Comparison</h4>
-                    <div class="comparison-chart">
-                      ${analysisResults.rightsComparisonHtml}
-                    </div>
-                  </div>
-                </div>
+                ${analysisResults.userRightsHtml}
               </div>
             </div>
           </div>
@@ -564,121 +390,6 @@ class AITermsSummarizer {
               </button>
             </div>
           </div>
-
-          <script>
-            // Interactive Functions for Enhanced Visualizations
-            function toggleViewMode(button, panelType) {
-              const isDetailedView = button.textContent.includes('Detailed') || button.textContent.includes('Visual') || button.textContent.includes('Chart');
-              
-              if (panelType === 'keypoints') {
-                const listView = document.getElementById('keypoints-list');
-                const chartView = document.getElementById('keypoints-chart');
-                
-                if (isDetailedView) {
-                  listView.style.display = 'none';
-                  chartView.style.display = 'block';
-                  button.innerHTML = '📝 List View';
-                } else {
-                  listView.style.display = 'block';
-                  chartView.style.display = 'none';
-                  button.innerHTML = '📊 Chart View';
-                }
-              } else if (panelType === 'risks') {
-                const simpleView = document.getElementById('risks-simple');
-                const detailedView = document.getElementById('risks-detailed');
-                
-                if (isDetailedView) {
-                  simpleView.style.display = 'none';
-                  detailedView.style.display = 'block';
-                  button.innerHTML = '📊 Simple View';
-                } else {
-                  simpleView.style.display = 'block';
-                  detailedView.style.display = 'none';
-                  button.innerHTML = '🎯 Detailed View';
-                }
-              } else if (panelType === 'rights') {
-                const gridView = document.getElementById('rights-grid');
-                const visualView = document.getElementById('rights-visual');
-                
-                if (isDetailedView) {
-                  gridView.style.display = 'none';
-                  visualView.style.display = 'block';
-                  button.innerHTML = '📋 Grid View';
-                } else {
-                  gridView.style.display = 'block';
-                  visualView.style.display = 'none';
-                  button.innerHTML = '🎨 Visual Map';
-                }
-              }
-            }
-
-            function filterPoints(category) {
-              const points = document.querySelectorAll('.point-item');
-              const filterBtns = document.querySelectorAll('.filter-btn');
-              
-              // Update active button
-              filterBtns.forEach(btn => btn.classList.remove('active'));
-              event.target.classList.add('active');
-              
-              points.forEach(point => {
-                if (category === 'all') {
-                  point.style.display = 'block';
-                } else if (category === 'critical') {
-                  point.style.display = point.dataset.importance === 'critical' ? 'block' : 'none';
-                } else if (category === 'rights') {
-                  point.style.display = point.dataset.categories.includes('Privacy') ? 'block' : 'none';
-                } else if (category === 'risks') {
-                  point.style.display = point.dataset.categories.includes('Liability') || point.dataset.categories.includes('Termination') ? 'block' : 'none';
-                }
-              });
-            }
-
-            function highlightPoint(index) {
-              const points = document.querySelectorAll('.point-item');
-              if (points[index]) {
-                points[index].style.background = 'linear-gradient(135deg, #fef3c7 0%, #f8fafc 100%)';
-                points[index].style.borderColor = '#f59e0b';
-                setTimeout(() => {
-                  points[index].style.background = '';
-                  points[index].style.borderColor = '';
-                }, 2000);
-              }
-            }
-
-            function explainPoint(index) {
-              alert(\`This point represents a key term or condition that affects your use of the service. Point #\${index + 1} has been identified as important for your understanding of the legal agreement.\`);
-            }
-
-            // Auto-animate elements when they come into view
-            function animateOnScroll() {
-              const elements = document.querySelectorAll('.risk-bubble, .timeline-point, .right-node');
-              elements.forEach(el => {
-                const rect = el.getBoundingClientRect();
-                if (rect.top < window.innerHeight && rect.bottom > 0) {
-                  el.style.animationPlayState = 'running';
-                }
-              });
-            }
-
-            window.addEventListener('scroll', animateOnScroll);
-            document.addEventListener('DOMContentLoaded', animateOnScroll);
-
-            // Add hover effects for interactive elements
-            document.querySelectorAll('.matrix-cell').forEach(cell => {
-              cell.addEventListener('click', function() {
-                const impact = this.dataset.impact;
-                const frequency = this.dataset.frequency;
-                alert(\`\${impact} impact, \${frequency} occurrence: These types of terms typically appear in most legal documents and may affect your rights.\`);
-              });
-            });
-
-            document.querySelectorAll('.risk-bubble').forEach(bubble => {
-              bubble.addEventListener('click', function() {
-                const category = this.dataset.category;
-                alert(\`Risk Category: \${category}\\n\\nThis category contains multiple risk factors that could affect your experience with the service.\`);
-              });
-            });
-          </script>
         </div>
       `;
 
@@ -749,26 +460,12 @@ class AITermsSummarizer {
         readingTime: readingTime,
         keyPoints: keyPoints.points,
         keyPointsHtml: keyPoints.html,
-        criticalCount: keyPoints.criticalCount,
-        importantCount: keyPoints.importantCount,
-        normalCount: keyPoints.normalCount,
-        timelineHtml: keyPoints.timelineHtml,
-        impactMatrixHtml: keyPoints.impactMatrixHtml,
         riskScore: riskAnalysis.score,
         overallRisk: riskAnalysis.level,
         riskVisualizationHtml: riskAnalysis.visualization,
         riskDetailsHtml: riskAnalysis.details,
-        riskBubblesHtml: riskAnalysis.bubblesHtml,
-        riskNetworkHtml: riskAnalysis.networkHtml,
-        riskTimelineHtml: riskAnalysis.timelineHtml,
-        riskTrend: riskAnalysis.trend,
-        riskTrendText: riskAnalysis.trendText,
         userRightsHtml: userRights.html,
-        rightsCount: userRights.count,
-        protectionScore: userRights.protectionScore,
-        rightsStats: userRights.stats,
-        rightsEcosystemHtml: userRights.ecosystemHtml,
-        rightsComparisonHtml: userRights.comparisonHtml
+        rightsCount: userRights.count
       };
     } catch (error) {
       console.error("Comprehensive analysis error:", error);
@@ -802,152 +499,38 @@ class AITermsSummarizer {
     return "Low";
   }
 
-  // Enhanced key points extraction with visual elements
+  // Enhanced key points extraction
   async extractEnhancedKeyPoints(text) {
     try {
       const keyPointsText = await this.callHuggingFace(text.substring(0, 3000), "summarize");
       const points = keyPointsText.split(/[.!]/).filter(point => point.trim().length > 10);
       
-      // Categorize points by importance
-      let criticalCount = 0, importantCount = 0, normalCount = 0;
-      
-      const html = points.map((point, index) => {
-        const importance = index < 3 ? 'critical' : index < 6 ? 'important' : 'normal';
-        if (importance === 'critical') criticalCount++;
-        else if (importance === 'important') importantCount++;
-        else normalCount++;
-
-        const categories = this.categorizePoint(point);
-        
-        return `
-        <div class="point-item enhanced" data-importance="${importance}" data-categories="${categories.join(' ')}">
+      const html = points.map((point, index) => `
+        <div class="point-item enhanced" data-importance="${index < 3 ? 'high' : 'medium'}">
           <div class="point-indicator">
             <div class="point-number">${index + 1}</div>
-            <div class="importance-badge ${importance}">
-              ${importance === 'critical' ? '🔴' : importance === 'important' ? '🟡' : '🟢'}
+            <div class="importance-badge ${index < 3 ? 'high' : 'medium'}">
+              ${index < 3 ? '🔴' : '🟡'}
             </div>
           </div>
           <div class="point-content">
             <p class="point-text">${point.trim()}</p>
             <div class="point-tags">
-              <span class="point-tag ${importance}">${importance.charAt(0).toUpperCase() + importance.slice(1)}</span>
-              ${categories.map(cat => `<span class="point-tag category">${cat}</span>`).join('')}
-            </div>
-            <div class="point-actions">
-              <button class="point-action" onclick="highlightPoint(${index})">🔍 Details</button>
-              <button class="point-action" onclick="explainPoint(${index})">💡 Explain</button>
+              <span class="point-tag ${index < 3 ? 'critical' : 'normal'}">
+                ${index < 3 ? 'Critical' : 'Important'}
+              </span>
             </div>
           </div>
         </div>
-      `}).join('');
+      `).join('');
       
-      // Generate timeline visualization
-      const timelineHtml = this.generatePointsTimeline(points);
-      
-      // Generate impact matrix
-      const impactMatrixHtml = this.generateImpactMatrix(points);
-      
-      return { 
-        points, 
-        html, 
-        criticalCount, 
-        importantCount, 
-        normalCount,
-        timelineHtml,
-        impactMatrixHtml
-      };
+      return { points, html };
     } catch (error) {
       return { 
         points: ['Document analysis in progress...'], 
-        html: '<div class="loading-note">📊 Extracting key points...</div>',
-        criticalCount: 0,
-        importantCount: 0,
-        normalCount: 1,
-        timelineHtml: '<div class="info-note">⏱️ Generating timeline...</div>',
-        impactMatrixHtml: '<div class="info-note">📊 Creating impact analysis...</div>'
+        html: '<div class="loading-note">📊 Extracting key points...</div>' 
       };
     }
-  }
-
-  // Categorize point by content
-  categorizePoint(point) {
-    const categories = [];
-    const lowerPoint = point.toLowerCase();
-    
-    if (lowerPoint.includes('data') || lowerPoint.includes('privacy') || lowerPoint.includes('information')) {
-      categories.push('Privacy');
-    }
-    if (lowerPoint.includes('payment') || lowerPoint.includes('billing') || lowerPoint.includes('fee')) {
-      categories.push('Payment');
-    }
-    if (lowerPoint.includes('terminate') || lowerPoint.includes('cancel') || lowerPoint.includes('end')) {
-      categories.push('Termination');
-    }
-    if (lowerPoint.includes('liable') || lowerPoint.includes('responsible') || lowerPoint.includes('damages')) {
-      categories.push('Liability');
-    }
-    if (lowerPoint.includes('content') || lowerPoint.includes('intellectual') || lowerPoint.includes('copyright')) {
-      categories.push('Content');
-    }
-    
-    return categories.length > 0 ? categories : ['General'];
-  }
-
-  // Generate timeline visualization for points
-  generatePointsTimeline(points) {
-    return points.slice(0, 6).map((point, index) => `
-      <div class="timeline-point" data-step="${index + 1}">
-        <div class="timeline-marker">
-          <div class="marker-number">${index + 1}</div>
-        </div>
-        <div class="timeline-content">
-          <div class="timeline-title">Section ${index + 1}</div>
-          <div class="timeline-text">${point.trim().substring(0, 80)}...</div>
-          <div class="timeline-impact ${index < 2 ? 'high' : index < 4 ? 'medium' : 'low'}">
-            Impact: ${index < 2 ? 'High' : index < 4 ? 'Medium' : 'Low'}
-          </div>
-        </div>
-      </div>
-    `).join('');
-  }
-
-  // Generate impact matrix visualization
-  generateImpactMatrix(points) {
-    const matrix = [
-      { impact: 'High', frequency: 'Common', points: points.slice(0, 2), position: 'high-common' },
-      { impact: 'High', frequency: 'Rare', points: points.slice(2, 3), position: 'high-rare' },
-      { impact: 'Medium', frequency: 'Common', points: points.slice(3, 5), position: 'medium-common' },
-      { impact: 'Medium', frequency: 'Rare', points: points.slice(5, 6), position: 'medium-rare' },
-      { impact: 'Low', frequency: 'Common', points: points.slice(6, 8), position: 'low-common' },
-      { impact: 'Low', frequency: 'Rare', points: points.slice(8, 10), position: 'low-rare' }
-    ];
-
-    return `
-      <div class="matrix-grid">
-        <div class="matrix-axes">
-          <div class="y-axis">
-            <span>High Impact</span>
-            <span>Medium Impact</span>
-            <span>Low Impact</span>
-          </div>
-          <div class="x-axis">
-            <span>Rare</span>
-            <span>Common</span>
-          </div>
-        </div>
-        <div class="matrix-cells">
-          ${matrix.map(cell => `
-            <div class="matrix-cell ${cell.position}" data-impact="${cell.impact}" data-frequency="${cell.frequency}">
-              <div class="cell-header">${cell.impact} / ${cell.frequency}</div>
-              <div class="cell-count">${cell.points.length} items</div>
-              <div class="cell-preview">
-                ${cell.points.map(p => `<div class="preview-item">${p.substring(0, 30)}...</div>`).join('')}
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    `;
   }
 
   // Enhanced risk analysis with visualization
@@ -959,23 +542,13 @@ class AITermsSummarizer {
       
       const visualization = this.createRiskVisualization(risks);
       const details = this.formatRiskDetails(risks);
-      const bubblesHtml = this.generateRiskBubbles(risks);
-      const networkHtml = this.generateRiskNetwork(risks);
-      const timelineHtml = this.generateRiskTimeline(risks);
-      const trend = Math.random() > 0.5 ? 1 : -1; // Simulated trend
-      const trendText = trend > 0 ? "Trending Higher" : "Stable/Decreasing";
       
       return {
         score: riskScore,
         level: riskLevel,
         visualization: visualization,
         details: details,
-        risks: risks,
-        bubblesHtml: bubblesHtml,
-        networkHtml: networkHtml,
-        timelineHtml: timelineHtml,
-        trend: trend,
-        trendText: trendText
+        risks: risks
       };
     } catch (error) {
       return {
@@ -983,12 +556,7 @@ class AITermsSummarizer {
         level: 'low',
         visualization: '<div class="info-note">📊 Risk analysis in progress...</div>',
         details: '<div class="info-note">🔍 Analyzing potential concerns...</div>',
-        risks: [],
-        bubblesHtml: '<div class="info-note">🫧 Loading risk categories...</div>',
-        networkHtml: '<div class="info-note">🔗 Building risk connections...</div>',
-        timelineHtml: '<div class="info-note">⏱️ Projecting timeline...</div>',
-        trend: 0,
-        trendText: "Analyzing..."
+        risks: []
       };
     }
   }
@@ -1121,116 +689,6 @@ class AITermsSummarizer {
     `).join('');
   }
 
-  // Generate risk bubbles visualization
-  generateRiskBubbles(risks) {
-    const categories = {};
-    risks.forEach(risk => {
-      if (!categories[risk.category]) {
-        categories[risk.category] = { count: 0, severity: risk.severity };
-      }
-      categories[risk.category].count++;
-    });
-
-    return `
-      <div class="bubble-container">
-        ${Object.entries(categories).map(([category, data]) => {
-          const size = Math.min(100, 40 + (data.count * 20));
-          return `
-            <div class="risk-bubble ${data.severity}" 
-                 style="width: ${size}px; height: ${size}px;"
-                 data-category="${category}"
-                 title="${category}: ${data.count} risks">
-              <div class="bubble-content">
-                <div class="bubble-icon">${this.getCategoryIcon(category)}</div>
-                <div class="bubble-count">${data.count}</div>
-              </div>
-              <div class="bubble-label">${category}</div>
-            </div>
-          `;
-        }).join('')}
-      </div>
-    `;
-  }
-
-  // Generate risk network visualization
-  generateRiskNetwork(risks) {
-    return `
-      <div class="network-visualization">
-        <div class="network-center">
-          <div class="central-node">
-            <div class="node-icon">📄</div>
-            <div class="node-label">Document</div>
-          </div>
-        </div>
-        <div class="risk-nodes">
-          ${risks.slice(0, 6).map((risk, index) => {
-            const angle = (index * 60) * Math.PI / 180;
-            const x = 150 + 120 * Math.cos(angle);
-            const y = 150 + 120 * Math.sin(angle);
-            return `
-              <div class="risk-node ${risk.severity}" 
-                   style="left: ${x}px; top: ${y}px;"
-                   data-risk="${risk.category}">
-                <div class="node-content">
-                  <div class="node-icon">${this.getRiskIcon(risk.severity)}</div>
-                  <div class="node-label">${risk.category}</div>
-                </div>
-                <div class="connection-line" style="transform: rotate(${angle * 180 / Math.PI + 180}deg);"></div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      </div>
-    `;
-  }
-
-  // Generate risk timeline
-  generateRiskTimeline(risks) {
-    const timeframes = [
-      { period: 'Immediate', risks: risks.filter(r => r.severity === 'high'), icon: '⚡' },
-      { period: 'Short-term', risks: risks.filter(r => r.severity === 'medium'), icon: '⏰' },
-      { period: 'Long-term', risks: risks.filter(r => r.severity === 'low'), icon: '📅' }
-    ];
-
-    return `
-      <div class="timeline-risks-container">
-        ${timeframes.map(timeframe => `
-          <div class="timeline-period ${timeframe.period.toLowerCase()}">
-            <div class="period-header">
-              <div class="period-icon">${timeframe.icon}</div>
-              <div class="period-info">
-                <h5>${timeframe.period}</h5>
-                <span>${timeframe.risks.length} potential impacts</span>
-              </div>
-            </div>
-            <div class="period-risks">
-              ${timeframe.risks.map(risk => `
-                <div class="timeline-risk-item">
-                  <div class="risk-indicator ${risk.severity}"></div>
-                  <span>${risk.category}</span>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    `;
-  }
-
-  // Get category icon
-  getCategoryIcon(category) {
-    const icons = {
-      'Data Sharing': '🔄',
-      'Account Termination': '🚪',
-      'Liability Limitation': '🛡️',
-      'Automatic Charges': '💳',
-      'Dispute Resolution': '⚖️',
-      'Content Rights': '📝',
-      'Privacy Concerns': '🔒'
-    };
-    return icons[category] || '📋';
-  }
-
   // Get risk icon
   getRiskIcon(severity) {
     const icons = {
@@ -1245,12 +703,6 @@ class AITermsSummarizer {
   async analyzeEnhancedUserRights(text) {
     const rights = this.identifyUserRights(text);
     
-    // Calculate protection statistics
-    const protectedCount = rights.filter(r => r.status === 'protected').length;
-    const limitedCount = rights.filter(r => r.status === 'limited').length;
-    const atRiskCount = rights.filter(r => r.status === 'at-risk').length;
-    const protectionScore = Math.round((protectedCount / rights.length) * 100);
-    
     const html = `
       <div class="rights-grid">
         ${rights.map(right => `
@@ -1263,141 +715,48 @@ class AITermsSummarizer {
                 <span class="status-indicator ${right.status}"></span>
                 <span class="status-text">${right.statusText}</span>
               </div>
-              <div class="right-strength-bar">
-                <div class="strength-fill ${right.status}" style="width: ${right.strength}%"></div>
-              </div>
             </div>
           </div>
         `).join('')}
       </div>
     `;
-    
-    // Generate ecosystem visualization
-    const ecosystemHtml = this.generateRightsEcosystem(rights);
-    
-    // Generate comparison chart
-    const comparisonHtml = this.generateRightsComparison(rights);
     
     return {
       html: html,
-      count: protectedCount,
-      protectionScore: protectionScore,
-      stats: {
-        protected: protectedCount,
-        limited: limitedCount,
-        atRisk: atRiskCount
-      },
-      ecosystemHtml: ecosystemHtml,
-      comparisonHtml: comparisonHtml
+      count: rights.filter(r => r.status === 'protected').length
     };
   }
 
-  // Generate rights ecosystem visualization
-  generateRightsEcosystem(rights) {
-    return `
-      <div class="ecosystem-container">
-        <div class="ecosystem-center">
-          <div class="user-node">
-            <div class="user-icon">👤</div>
-            <div class="user-label">You</div>
-          </div>
-        </div>
-        <div class="rights-orbit">
-          ${rights.map((right, index) => {
-            const angle = (index * (360 / rights.length)) * Math.PI / 180;
-            const radius = 120;
-            const x = 150 + radius * Math.cos(angle);
-            const y = 150 + radius * Math.sin(angle);
-            return `
-              <div class="right-node ${right.status}" 
-                   style="left: ${x}px; top: ${y}px;"
-                   data-right="${right.title}">
-                <div class="right-node-content">
-                  <div class="right-node-icon">${right.icon}</div>
-                  <div class="right-node-label">${right.title}</div>
-                </div>
-                <div class="protection-ring ${right.status}"></div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      </div>
-    `;
-  }
-
-  // Generate rights comparison chart
-  generateRightsComparison(rights) {
-    return `
-      <div class="comparison-container">
-        ${rights.map(right => `
-          <div class="comparison-item">
-            <div class="comparison-header">
-              <span class="comparison-icon">${right.icon}</span>
-              <span class="comparison-title">${right.title}</span>
-            </div>
-            <div class="comparison-bar">
-              <div class="bar-track">
-                <div class="bar-fill ${right.status}" style="width: ${right.strength}%"></div>
-              </div>
-              <div class="bar-value">${right.strength}%</div>
-            </div>
-            <div class="comparison-note">${right.statusText}</div>
-          </div>
-        `).join('')}
-      </div>
-    `;
-  }
-
-  // Identify user rights with strength values
+  // Identify user rights
   identifyUserRights(text) {
     return [
       {
         title: "Data Privacy",
         icon: "🔒",
-        description: "Your personal information protection and control over data usage",
+        description: "Your personal information protection",
         status: "protected",
-        statusText: "Well Protected",
-        strength: 85
+        statusText: "Protected"
       },
       {
         title: "Account Control", 
         icon: "👤",
-        description: "Ability to modify, export, or delete your account and data",
+        description: "Ability to modify or delete your account",
         status: "limited",
-        statusText: "Partially Protected",
-        strength: 60
+        statusText: "Partially Protected"
       },
       {
         title: "Content Ownership",
         icon: "📝", 
-        description: "Rights to content you create and intellectual property",
+        description: "Rights to content you create",
         status: "protected",
-        statusText: "You Retain Rights",
-        strength: 90
+        statusText: "You Retain Rights"
       },
       {
         title: "Service Termination",
         icon: "🚪",
-        description: "Notice period and conditions for service changes or termination",
+        description: "Notice period for service changes",
         status: "at-risk",
-        statusText: "Limited Notice",
-        strength: 30
-      },
-      {
-        title: "Dispute Resolution",
-        icon: "⚖️",
-        description: "Your options for resolving conflicts and legal disputes",
-        status: "limited",
-        statusText: "Arbitration Required",
-        strength: 45
-      },
-      {
-        title: "Fee Protection",
-        icon: "💰",
-        description: "Protection against unexpected charges and billing transparency",
-        status: "protected",
-        statusText: "Clear Terms",
-        strength: 75
+        statusText: "Limited Notice"
       }
     ];
   }
