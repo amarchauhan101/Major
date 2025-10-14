@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T&C AI Analyzer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 450px;
+            min-height: 650px;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            background: white;
+            margin: 8px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+            min-height: 634px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 13px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content {
+            padding: 20px;
+            max-height: 480px;
+            overflow-y: auto;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #495057;
+            border: 1px solid #dee2e6;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .language-selector {
+            margin-bottom: 16px;
+        }
+
+        .language-selector select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 13px;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+        .language-selector select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .status-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #28a745;
+            transition: all 0.2s ease;
+        }
+
+        .status-label {
+            font-size: 11px;
+            color: #6c757d;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .status-value {
+            font-size: 13px;
+            font-weight: 700;
+            color: #28a745;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #e9ecef;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 12px 16px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-content {
+            padding: 16px;
+            background: white;
+        }
+
+        .risk-overview {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .risk-visual {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            gap: 20px;
+        }
+
+        .risk-circle {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, #e9ecef 0deg 0deg, #667eea 0deg 360deg, #e9ecef 360deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: riskCircleAnimation 2s ease-in-out;
+        }
+
+        @keyframes riskCircleAnimation {
+            from { transform: rotate(-90deg) scale(0.5); opacity: 0; }
+            to { transform: rotate(0deg) scale(1); opacity: 1; }
+        }
+
+        .risk-circle::before {
+            content: '';
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .risk-percentage {
+            position: relative;
+            z-index: 1;
+            font-size: 18px;
+            font-weight: 700;
+            color: #495057;
+        }
+
+        .risk-info {
+            flex: 1;
+        }
+
+        .risk-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .risk-very-low { background: #d4edda; color: #155724; }
+        .risk-low { background: #cce5ff; color: #004085; }
+        .risk-medium { background: #fff3cd; color: #856404; }
+        .risk-high { background: #f8d7da; color: #721c24; }
+
+        .risk-description {
+            font-size: 13px;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
+        .summary-text {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #495057;
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 16px;
+        }
+
+        .key-points {
+            list-style: none;
+        }
+
+        .key-point {
+            background: #f8f9fa;
+            margin-bottom: 8px;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            font-size: 13px;
+            line-height: 1.4;
+            position: relative;
+            animation: slideInLeft 0.5s ease forwards;
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        .key-point:nth-child(1) { animation-delay: 0.1s; }
+        .key-point:nth-child(2) { animation-delay: 0.2s; }
+        .key-point:nth-child(3) { animation-delay: 0.3s; }
+        .key-point:nth-child(4) { animation-delay: 0.4s; }
+        .key-point:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes slideInLeft {
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .key-point::before {
+            content: '✓';
+            position: absolute;
+            left: -2px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #667eea;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .key-point-text {
+            margin-left: 24px;
+        }
+
+        .categories-visual {
+            margin-top: 16px;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .category-label {
+            flex: 1;
+            font-size: 12px;
+            font-weight: 600;
+            color: #495057;
+            text-transform: capitalize;
+        }
+
+        .category-bar {
+            width: 120px;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0 8px;
+        }
+
+        .category-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 1.5s ease-in-out;
+            width: 0%;
+        }
+
+        .category-percentage {
+            font-size: 11px;
+            font-weight: 600;
+            color: #6c757d;
+            min-width: 30px;
+        }
+
+        .important-clauses {
+            margin-top: 16px;
+        }
+
+        .clause-item {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            line-height: 1.4;
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .clause-item:nth-child(1) { animation-delay: 0.1s; }
+        .clause-item:nth-child(2) { animation-delay: 0.2s; }
+        .clause-item:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .clause-type {
+            font-weight: 600;
+            color: #856404;
+            text-transform: uppercase;
+            font-size: 10px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .concern-level {
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .concern-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .concern-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .clause-text {
+            color: #664d03;
+        }
+
+        .metadata {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .metadata-item {
+            text-align: center;
+            background: #e9ecef;
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        .metadata-label {
+            font-size: 10px;
+            color: #6c757d;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .metadata-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #495057;
+            margin-top: 2px;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 16px;
+            border-radius: 12px;
+            margin: 16px 0;
+            font-size: 13px;
+            border: 1px solid #f5c6cb;
+            display: none;
+        }
+
+        .error.show { display: block; }
+
+        .footer {
+            padding: 16px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            text-align: center;
+            font-size: 11px;
+            color: #6c757d;
+        }
+
+        .accordion-section {
+            margin-bottom: 12px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #e9ecef;
+        }
+
+        .accordion-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .accordion-header:hover {
+            background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+        }
+
+        .accordion-header.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .accordion-title {
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .accordion-toggle {
+            font-size: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .accordion-header.active .accordion-toggle {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: white;
+        }
+
+        .accordion-content.expanded {
+            max-height: 400px;
+        }
+
+        .accordion-body {
+            padding: 16px;
+        }
+
+        .risk-radar-container {
+            display: flex;
+            justify-content: center;
+            margin: 16px 0;
+        }
+
+        .radar-chart {
+            width: 200px;
+            height: 200px;
+        }
+
+        .risk-heatmap {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .heatmap-cell {
+            padding: 12px 8px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .heatmap-low { background: #d4edda; color: #155724; }
+        .heatmap-medium { background: #fff3cd; color: #856404; }
+        .heatmap-high { background: #f8d7da; color: #721c24; }
+
+        .word-cloud-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+
+        .word-tag {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #667eea;
+            color: white;
+            opacity: 0.8;
+        }
+
+        .word-tag.frequent {
+            font-size: 13px;
+            opacity: 1;
+        }
+
+        .bar-chart-container {
+            margin: 16px 0;
+        }
+
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 6px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .chart-label {
+            flex: 0 0 80px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .chart-bar-fill {
+            flex: 1;
+            height: 12px;
+            background: #e9ecef;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 0 8px;
+        }
+
+        .chart-fill-inner {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 6px;
+            transition: width 1s ease-in-out;
+            width: 0%;
+        }
+
+        .chart-value {
+            font-size: 10px;
+            font-weight: 600;
+            color: #6c757d;
+            min-width: 25px;
+        }
+
+        .timeline-container {
+            margin: 16px 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+
+        .timeline-icon {
+            flex: 0 0 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-right: 12px;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 2px;
+        }
+
+        .timeline-description {
+            font-size: 11px;
+            color: #6c757d;
+        }
+
+        .color-coded-text {
+            line-height: 1.6;
+            margin: 16px 0;
+        }
+
+        .text-safe { background: #d4edda; color: #155724; padding: 2px 4px; border-radius: 3px; }
+        .text-caution { background: #fff3cd; color: #856404; padding: 2px 4px; border-radius: 3px; }
+        .text-danger { background: #f8d7da; color: #721c24; padding: 2px 4px; border-radius: 3px; }
+
+        .enhanced-summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .summary-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .summary-card-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .summary-card-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .summary-card-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #495057;
+        }
+
+        .footer {
+            padding: 16px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            text-align: center;
+            font-size: 11px;
+            color: #6c757d;
+        }
+
+        .tab-nav {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 16px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            background: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #6c757d;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .scrollbar-thin {
+            scrollbar-width: thin;
+            scrollbar-color: #667eea #f1f1f1;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 3px;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        .notification {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 T&C AI Analyzer</h1>
+            <p>Smart • Visual • Multi-language</p>
+        </div>
+
+        <div class="content scrollbar-thin">
+            <!-- Language Selection -->
+            <div class="language-selector">
+                <select id="language-select">
+                    <option value="en">🇺🇸 English</option>
+                    <option value="es">🇪🇸 Spanish</option>
+                    <option value="fr">🇫🇷 French</option>
+                    <option value="de">🇩🇪 German</option>
+                    <option value="it">🇮🇹 Italian</option>
+                    <option value="pt">🇵🇹 Portuguese</option>
+                    <option value="ru">🇷🇺 Russian</option>
+                    <option value="ja">🇯🇵 Japanese</option>
+                    <option value="ko">🇰🇷 Korean</option>
+                    <option value="zh">🇨🇳 Chinese</option>
+                </select>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls">
+                <button class="btn btn-primary" id="analyze-btn">
+                    🔍 Analyze Page
+                </button>
+                <button class="btn btn-secondary" id="settings-btn">
+                    ⚙️ Settings
+                </button>
+            </div>
+
+            <!-- Status Grid -->
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="status-label">Backend</div>
+                    <div class="status-value" id="backend-status">Checking...</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">Analysis</div>
+                    <div class="status-value" id="analysis-status">Ready</div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="loading" id="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p><strong>Analyzing with AI...</strong></p>
+                <p>Processing Terms & Conditions</p>
+            </div>
+
+            <!-- Results Container -->
+            <div class="results" id="results">
+                <!-- Tab Navigation -->
+                <div class="tab-nav">
+                    <button class="tab-btn active" data-tab="overview">📊 Overview</button>
+                    <button class="tab-btn" data-tab="analysis">🔍 Analysis</button>
+                    <button class="tab-btn" data-tab="details">📝 Details</button>
+                    <button class="tab-btn" data-tab="risks">⚠️ Risks</button>
+                </div>
+
+                <!-- Overview Tab -->
+                <div class="tab-content active" id="overview-tab">
+                    <!-- Risk Overview -->
+                    <div class="section">
+                        <div class="section-header">
+                            <div class="section-title">
+                                🎯 Risk Assessment
+                            </div>
+                        </div>
+                        <div class="section-content">
+                            <div class="risk-overview">
+                                <div class="risk-visual">
+                                    <div class="risk-circle" id="risk-circle">
+                                        <div class="risk-percentage" id="risk-percentage">0%</div>
+                                    </div>
+                                    <div class="risk-info">
+                                        <div class="risk-badge" id="risk-badge">Loading...</div>
+                                        <div class="risk-description" id="risk-description">
+                                            Analyzing risk factors...
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Categories Breakdown -->
+                    <div class="section">
+                        <div class="section-header">
+                            <div class="section-title">
+                                📊 Content Categories
+                            </div>
+                        </div>
+                        <div class="section-content">
+                            <div class="categories-visual" id="categories-visual">
+                                <div class="no-data">Analyzing content categories...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analysis Tab -->
+                <div class="tab-content" id="analysis-tab">
+                    <!-- Comprehensive Analysis Accordion -->
+                    <div class="accordion-section">
+                        <div class="accordion-header active" data-accordion="summary">
+                            <div class="accordion-title">
+                                📄 Summary / Key Points
+                            </div>
+                            <div class="accordion-toggle">▼</div>
+                        </div>
+                        <div class="accordion-content expanded" id="summary-accordion">
+                            <div class="accordion-body">
+                                <div class="summary-text" id="enhanced-summary-text">
+                                    Auto-generated summary will appear here...
+                                </div>
+                                <div class="enhanced-summary-grid" id="enhanced-summary-grid">
+                                    <div class="no-data">Summary details loading...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-section">
+                        <div class="accordion-header" data-accordion="data-collected">
+                            <div class="accordion-title">
+                                📊 Data Collected
+                            </div>
+                            <div class="accordion-toggle">▼</div>
+                        </div>
+                        <div class="accordion-content" id="data-collected-accordion">
+                            <div class="accordion-body">
+                                <div class="bar-chart-container" id="data-collected-chart">
+                                    <div class="no-data">Data collection analysis loading...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-section">
+                        <div class="accordion-header" data-accordion="data-usage">
+                            <div class="accordion-title">
+                                🎯 Data Usage
+                            </div>
+                            <div class="accordion-toggle">▼</div>
+                        </div>
+                        <div class="accordion-content" id="data-usage-accordion">
+                            <div class="accordion-body">
+                                <div class="risk-heatmap" id="data-usage-heatmap">
+                                    <div class="no-data">Data usage analysis loading...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-section">
+                        <div class="accordion-header" data-accordion="data-sharing">
+                            <div class="accordion-title">
+                                🔗 Data Sharing
+                            </div>
+                            <div class="accordion-toggle">▼</div>
+                        </div>
+                        <div class="accordion-content" id="data-sharing-accordion">
+                            <div class="accordion-body">
+                                <div class="word-cloud-container" id="data-sharing-wordcloud">
+                                    <div class="no-data">Data sharing analysis loading...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-section">
+                        <div class="accordion-header" data-accordion="user-rights">
+                            <div class="accordion-title">
+                                ⚖️ User Rights
+                            </div>
+                            <div class="accordion-toggle">▼</div>
+                        </div>
+                        <div class="accordion-content" id="user-rights-accordion">
+                            <div class="accordion-body">
+                                <div class="timeline-container" id="user-rights-timeline">
+                                    <div class="no-data">User rights analysis loading...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-section">
+                        <div class="accordion-header" data-accordion="liabilities">
+                            <div class="accordion-title">
+                                ⚠️ Liabilities
+                            </div>
+                            <div class="accordion-toggle">▼</div>
+                        </div>
+                        <div class="accordion-content" id="liabilities-accordion">
+                            <div class="accordion-body">
+                                <div class="color-coded-text" id="liabilities-text">
+                                    <div class="no-data">Liability analysis loading...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-section">
+                        <div class="accordion-header" data-accordion="renewals">
+                            <div class="accordion-title">
+                                🔄 Automatic Renewals
+                            </div>
+                            <div class="accordion-toggle">▼</div>
+                        </div>
+                        <div class="accordion-content" id="renewals-accordion">
+                            <div class="accordion-body">
+                                <div class="bar-chart-container" id="renewals-chart">
+                                    <div class="no-data">Renewal analysis loading...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-section">
+                        <div class="accordion-header" data-accordion="termination">
+                            <div class="accordion-title">
+                                🚪 Termination Clauses
+                            </div>
+                            <div class="accordion-toggle">▼</div>
+                        </div>
+                        <div class="accordion-content" id="termination-accordion">
+                            <div class="accordion-body">
+                                <div class="timeline-container" id="termination-timeline">
+                                    <div class="no-data">Termination analysis loading...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Risk Score Visualization -->
+                    <div class="section">
+                        <div class="section-header">
+                            <div class="section-title">
+                                📈 Risk Score Breakdown
+                            </div>
+                        </div>
+                        <div class="section-content">
+                            <div class="risk-radar-container">
+                                <canvas class="radar-chart" id="risk-radar-chart"></canvas>
+                            </div>
+                            <div class="risk-heatmap" id="risk-breakdown-heatmap">
+                                <div class="no-data">Risk breakdown loading...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Details Tab -->
+                <div class="tab-content" id="details-tab">
+                    <!-- Executive Summary -->
+                    <div class="section">
+                        <div class="section-header">
+                            <div class="section-title">
+                                📄 Executive Summary
+                            </div>
+                        </div>
+                        <div class="section-content">
+                            <div class="summary-text" id="summary-text">
+                                Analysis results will appear here...
+                            </div>
+                            <div class="metadata">
+                                <div class="metadata-item">
+                                    <div class="metadata-label">Words</div>
+                                    <div class="metadata-value" id="word-count">--</div>
+                                </div>
+                                <div class="metadata-item">
+                                    <div class="metadata-label">Reading</div>
+                                    <div class="metadata-value" id="reading-time">-- min</div>
+                                </div>
+                                <div class="metadata-item">
+                                    <div class="metadata-label">Score</div>
+                                    <div class="metadata-value" id="readability-score">--</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Key Points -->
+                    <div class="section">
+                        <div class="section-header">
+                            <div class="section-title">
+                                🔑 Key Points
+                            </div>
+                        </div>
+                        <div class="section-content">
+                            <ul class="key-points" id="key-points">
+                                <div class="no-data">Key points will appear here...</div>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risks Tab -->
+                <div class="tab-content" id="risks-tab">
+                    <!-- Important Clauses -->
+                    <div class="section">
+                        <div class="section-header">
+                            <div class="section-title">
+                                ⚠️ Important Clauses
+                            </div>
+                        </div>
+                        <div class="section-content">
+                            <div class="important-clauses" id="important-clauses">
+                                <div class="no-data">Important clauses will appear here...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div class="error" id="error-message"></div>
+        </div>
+
+        <div class="footer">
+            AI-powered • Privacy-focused • Multi-language
+        </div>
+    </div>
+
+    <script src="popup_fixed.js"></script>
+    <script src="chart.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "_ga": "Analytics",
+  "_gid": "Analytics",
+  "_fbp": "Marketing",
+  "sessionid": "Session",
+  "authToken": "Authentication",
+  "csrftoken": "Security",
+  "ads_user": "Marketing",
+  "session-id": "Session Management",
+  "session-id-time": "Session Timing",
+  "session-token": "Authentication",
+  "csm-hit": "Performance Monitoring",
+  "rxc": "Tracking"
+}

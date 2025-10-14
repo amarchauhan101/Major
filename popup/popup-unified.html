@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Lens - Professional Privacy Protection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #1E90FF;
+            --primary-blue-dark: #0066CC;
+            --primary-blue-light: #E3F2FD;
+            --white: #FFFFFF;
+            --bg-gray: #F8F9FA;
+            --border-gray: #E1E4E8;
+            --text-primary: #0D1117;
+            --text-secondary: #57606A;
+            --text-tertiary: #6E7781;
+            --success-green: #00C853;
+            --success-bg: #E8F5E9;
+            --danger-red: #D32F2F;
+            --danger-bg: #FFEBEE;
+            --warning-orange: #FF9800;
+            --warning-bg: #FFF3E0;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            width: 420px;
+            min-height: 600px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-gray);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            background: var(--white);
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1E90FF 0%, #0066CC 100%);
+            padding: 24px 24px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.4;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+        }
+
+        .logo-icon svg {
+            width: 20px;
+            height: 20px;
+            stroke: white;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .logo-icon.loading svg {
+            animation: rotate 2s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 400;
+            margin-left: 48px;
+        }
+
+        /* Navigation */
+        .nav-tabs {
+            display: flex;
+            background: var(--white);
+            border-bottom: 1px solid var(--border-gray);
+            padding: 0 16px;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 14px 16px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-tab.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        .nav-tab:hover:not(.active) {
+            color: var(--text-secondary);
+        }
+
+        /* Content */
+        .content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Status Cards */
+        .status-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .status-card {
+            background: var(--bg-gray);
+            border: 1px solid var(--border-gray);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .status-card:hover {
+            box-shadow: var(--shadow-sm);
+            border-color: var(--primary-blue);
+        }
+
+        .status-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .status-icon svg {
+            width: 22px;
+            height: 22px;
+            stroke-width: 2;
+        }
+
+        .status-icon.cookies {
+            background: var(--primary-blue-light);
+            color: var(--primary-blue);
+        }
+
+        .status-icon.cookies svg {
+            stroke: var(--primary-blue);
+            fill: none;
+        }
+
+        .status-icon.terms {
+            background: var(--success-bg);
+            color: var(--success-green);
+        }
+
+        .status-icon.terms svg {
+            stroke: var(--success-green);
+            fill: none;
+        }
+
+        .status-label {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .status-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        /* Buttons */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .btn {
+            padding: 13px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: inherit;
+        }
+
+        .btn svg {
+            width: 18px;
+            height: 18px;
+            stroke-width: 2;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-blue-dark);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--text-primary);
+            border: 1px solid var(--border-gray);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-gray);
+            border-color: var(--text-tertiary);
+        }
+
+        /* URL Display */
+        .url-display {
+            background: var(--bg-gray);
+            border: 1px solid var(--border-gray);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 20px;
+        }
+
+        .url-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin-bottom: 6px;
+        }
+
+        .url-value {
+            font-size: 13px;
+            color: var(--text-secondary);
+            word-break: break-all;
+            line-height: 1.4;
+        }
+
+        /* Result Cards */
+        .analysis-results {
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: var(--white);
+            border: 1px solid var(--border-gray);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .result-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-blue);
+        }
+
+        .result-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            gap: 12px;
+        }
+
+        .result-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .risk-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+        }
+
+        .risk-badge.low {
+            background: var(--success-bg);
+            color: var(--success-green);
+        }
+
+        .risk-badge.medium {
+            background: var(--warning-bg);
+            color: var(--warning-orange);
+        }
+
+        .risk-badge.high {
+            background: var(--danger-bg);
+            color: var(--danger-red);
+        }
+
+        .result-content {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Loading State */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner-container {
+            position: relative;
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 20px;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid var(--border-gray);
+            border-top: 3px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .spinner-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .spinner-icon svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--primary-blue);
+            stroke-width: 2;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(0.9);
+            }
+        }
+
+        .loading-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+        }
+
+        .empty-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--bg-gray);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .empty-icon svg {
+            width: 32px;
+            height: 32px;
+            stroke: var(--text-tertiary);
+            stroke-width: 2;
+            opacity: 0.6;
+        }
+
+        .empty-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .empty-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg-gray);
+            padding: 14px 24px;
+            text-align: center;
+            border-top: 1px solid var(--border-gray);
+        }
+
+        .footer-text {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+            letter-spacing: 0.02em;
+        }
+
+        .footer-text .separator {
+            margin: 0 8px;
+            opacity: 0.4;
+        }
+
+        /* Success State */
+        .success-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--success-bg);
+            color: var(--success-green);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .success-badge svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--success-green);
+            stroke-width: 2.5;
+        }
+
+        /* Cookie Management Styles */
+        .cookie-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: var(--bg-gray);
+            border-radius: var(--radius-md);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 11px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .cookie-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .cookie-controls .btn {
+            flex: 1;
+            padding: 10px 12px;
+            font-size: 13px;
+        }
+
+        .cookies-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .cookie-item {
+            background: var(--white);
+            border: 1px solid var(--border-gray);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .cookie-item:hover {
+            border-color: var(--primary-blue);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .cookie-item.essential {
+            border-left: 4px solid var(--success-green);
+        }
+
+        .cookie-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .cookie-info {
+            flex: 1;
+        }
+
+        .cookie-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .cookie-domain {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .cookie-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cookie-toggle {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+
+        .cookie-checkbox {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-gray);
+            transition: 0.3s;
+            border-radius: 20px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: var(--white);
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        .cookie-checkbox:checked + .toggle-slider {
+            background-color: var(--success-green);
+        }
+
+        .cookie-checkbox:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .cookie-checkbox:disabled + .toggle-slider {
+            background-color: var(--primary-blue);
+            cursor: not-allowed;
+        }
+
+        .cookie-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .detail-label {
+            color: var(--text-tertiary);
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .detail-value.essential {
+            color: var(--success-green);
+        }
+
+        .detail-value.optional {
+            color: var(--warning-orange);
+        }
+
+        @media (max-width: 400px) {
+            .cookie-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .cookie-details {
+                grid-template-columns: 1fr;
+            }
+
+            .cookie-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon" id="logo-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </div>
+                    <div class="logo-text">Privacy Lens</div>
+                </div>
+                <div class="subtitle">Revealing what's hidden in fine print</div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="overview">Overview</button>
+            <button class="nav-tab" data-tab="cookies">Cookies</button>
+            <button class="nav-tab" data-tab="terms">Terms</button>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content">
+            <!-- Overview Tab -->
+            <div class="tab-content active" id="overview-tab">
+                <div class="status-cards">
+                    <div class="status-card">
+                        <div class="status-icon cookies">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <circle cx="12" cy="12" r="1" fill="currentColor"></circle>
+                                <circle cx="8" cy="8" r="1" fill="currentColor"></circle>
+                                <circle cx="16" cy="9" r="1" fill="currentColor"></circle>
+                                <circle cx="10" cy="15" r="1" fill="currentColor"></circle>
+                                <circle cx="15" cy="15" r="1" fill="currentColor"></circle>
+                            </svg>
+                        </div>
+                        <div class="status-label">Cookies Detected</div>
+                        <div class="status-value" id="cookie-count">0</div>
+                </div>
+                    <div class="status-card">
+                        <div class="status-icon terms">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="9" y1="13" x2="15" y2="13"></line>
+                                <line x1="9" y1="17" x2="15" y2="17"></line>
+                            </svg>
+                </div>
+                        <div class="status-label">Terms Status</div>
+                        <div class="status-value" id="terms-status">Ready</div>
+                </div>
+            </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="full-analysis">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        Complete Privacy Analysis
+                    </button>
+                    <button class="btn btn-secondary" id="quick-scan">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                        </svg>
+                        Quick Scan
+                    </button>
+                </div>
+
+                <div class="analysis-results" id="overview-results"></div>
+            </div>
+
+            <!-- Cookie Analysis Tab -->
+            <div class="tab-content" id="cookies-tab">
+                <div class="url-display">
+                    <div class="url-label">Analyzed Page</div>
+                    <div class="url-value" id="analyzed-url">Current page</div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="scan-cookies">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        Scan Cookies
+                    </button>
+                    <button class="btn btn-secondary" id="manage-cookies">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path
+                                d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24">
+                            </path>
+                        </svg>
+                        Manage Cookies
+                    </button>
+                </div>
+
+                <div class="analysis-results" id="cookie-results">
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <circle cx="12" cy="12" r="1" fill="currentColor"></circle>
+                                <circle cx="8" cy="8" r="1" fill="currentColor"></circle>
+                                <circle cx="16" cy="9" r="1" fill="currentColor"></circle>
+                            </svg>
+                        </div>
+                        <div class="empty-title">No Cookie Analysis Yet</div>
+                        <div class="empty-description">
+                            Click "Scan Cookies" to analyze cookies on this website and see detailed privacy insights.
+                </div>
+                </div>
+                </div>
+            </div>
+
+            <!-- Terms Analysis Tab -->
+            <div class="tab-content" id="terms-tab">
+                <div class="url-display">
+                    <div class="url-label">Analyzed Page</div>
+                    <div class="url-value" id="terms-analyzed-url">Current page</div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="analyze-terms">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        Analyze Terms & Conditions
+                    </button>
+                    <button class="btn btn-secondary" id="view-summary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                        View Summary
+                    </button>
+                </div>
+                
+                <div class="analysis-results" id="terms-results">
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                        </div>
+                        <div class="empty-title">No Terms Analysis Yet</div>
+                        <div class="empty-description">
+                            Click "Analyze Terms & Conditions" to get AI-powered insights about this website's terms and
+                            privacy policy.
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="loading" id="loading">
+                <div class="spinner-container">
+                <div class="spinner"></div>
+                    <div class="spinner-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="loading-text" id="loading-text">Analyzing privacy details...</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-text">
+                Privacy Lens<span class="separator">•</span>Trust<span class="separator">•</span>Clarity<span
+                    class="separator">•</span>Insight
+            </div>
+        </div>
+    </div>
+
+    <script src="popup-unified.js"></script>
+
+</body>
+
+</html>

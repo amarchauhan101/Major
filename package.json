@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@tensorflow/tfjs-converter": "^4.22.0",
+    "lucide-static": "^0.545.0"
+  }
+}
