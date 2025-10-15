@@ -722,7 +722,7 @@ def calculate_readability_score(text: str) -> int:
     return max(0, min(100, int(score)))
 
 def translate_comprehensive_analysis(summary_data: dict, target_language: str) -> dict:
-    """Translate comprehensive analysis results to target language."""
+    """Translate comprehensive analysis results to target language with enhanced coverage."""
     try:
         # Translate basic fields
         summary_data["executive_summary"] = translate_text(summary_data["executive_summary"], target_language)
@@ -731,6 +731,7 @@ def translate_comprehensive_analysis(summary_data: dict, target_language: str) -
         # Translate important clauses
         for clause in summary_data["important_clauses"]:
             clause["clause"] = translate_text(clause["clause"], target_language)
+            clause["type"] = translate_text(clause["type"], target_language)
         
         # Translate enhanced analysis if available
         if "enhanced_analysis" in summary_data:
@@ -745,6 +746,76 @@ def translate_comprehensive_analysis(summary_data: dict, target_language: str) -
                     translate_text(highlight, target_language) 
                     for highlight in enhanced["summary_key_points"]["key_highlights"]
                 ]
+            
+            # Translate risk score recommendations
+            if "risk_score_breakdown" in enhanced and "recommendations" in enhanced["risk_score_breakdown"]:
+                enhanced["risk_score_breakdown"]["recommendations"] = translate_risk_recommendations(
+                    enhanced["risk_score_breakdown"]["recommendations"], target_language
+                )
+            
+            # Translate data collection methods
+            if "data_collected" in enhanced and "collection_methods" in enhanced["data_collected"]:
+                enhanced["data_collected"]["collection_methods"] = [
+                    translate_text(method, target_language) 
+                    for method in enhanced["data_collected"]["collection_methods"]
+                ]
+            
+            # Translate data usage opt-out mechanisms
+            if "data_usage" in enhanced and "opt_out_mechanisms" in enhanced["data_usage"]:
+                enhanced["data_usage"]["opt_out_mechanisms"] = [
+                    translate_text(mechanism, target_language) 
+                    for mechanism in enhanced["data_usage"]["opt_out_mechanisms"]
+                ]
+            
+            # Translate user rights contact methods
+            if "user_rights" in enhanced and "contact_method" in enhanced["user_rights"]:
+                enhanced["user_rights"]["contact_method"] = [
+                    translate_text(method, target_language) 
+                    for method in enhanced["user_rights"]["contact_method"]
+                ]
+            
+            # Translate response time
+            if "user_rights" in enhanced and "response_time" in enhanced["user_rights"]:
+                enhanced["user_rights"]["response_time"] = translate_text(
+                    enhanced["user_rights"]["response_time"], target_language
+                )
+            
+            # Translate liability protection level
+            if "liabilities" in enhanced and "user_protection_level" in enhanced["liabilities"]:
+                enhanced["liabilities"]["user_protection_level"] = translate_text(
+                    enhanced["liabilities"]["user_protection_level"], target_language
+                )
+            
+            # Translate legal jurisdiction
+            if "liabilities" in enhanced and "legal_jurisdiction" in enhanced["liabilities"]:
+                enhanced["liabilities"]["legal_jurisdiction"] = translate_text(
+                    enhanced["liabilities"]["legal_jurisdiction"], target_language
+                )
+            
+            # Translate cancellation difficulty
+            if "automatic_renewals" in enhanced and "cancellation_difficulty" in enhanced["automatic_renewals"]:
+                enhanced["automatic_renewals"]["cancellation_difficulty"] = translate_text(
+                    enhanced["automatic_renewals"]["cancellation_difficulty"], target_language
+                )
+            
+            # Translate refund policy conditions
+            if "automatic_renewals" in enhanced and "refund_policy" in enhanced["automatic_renewals"]:
+                if "conditions" in enhanced["automatic_renewals"]["refund_policy"]:
+                    enhanced["automatic_renewals"]["refund_policy"]["conditions"] = translate_text(
+                        enhanced["automatic_renewals"]["refund_policy"]["conditions"], target_language
+                    )
+            
+            # Translate termination notice periods
+            if "termination_clauses" in enhanced:
+                if "user_notice_period" in enhanced["termination_clauses"]:
+                    enhanced["termination_clauses"]["user_notice_period"] = translate_text(
+                        enhanced["termination_clauses"]["user_notice_period"], target_language
+                    )
+                
+                if "data_deletion_policy" in enhanced["termination_clauses"] and "timeline" in enhanced["termination_clauses"]["data_deletion_policy"]:
+                    enhanced["termination_clauses"]["data_deletion_policy"]["timeline"] = translate_text(
+                        enhanced["termination_clauses"]["data_deletion_policy"]["timeline"], target_language
+                    )
         
         return summary_data
     except Exception as e:
@@ -752,27 +823,60 @@ def translate_comprehensive_analysis(summary_data: dict, target_language: str) -
         return summary_data
 
 def translate_text(text: str, target_language: str) -> str:
-    """Translate text to target language."""
+    """Translate text to target language with enhanced support for Indian languages."""
     try:
         if target_language == 'en':
             return text
         
-        # Translate in chunks to avoid API limits
-        sentences = sent_tokenize(text)
-        translated_sentences = []
+        # Handle empty or very short text
+        if not text or len(text.strip()) < 3:
+            return text
         
-        for sentence in sentences:
-            if len(sentence.strip()) > 0:
+        # For Indian languages, try to preserve technical terms
+        indian_languages = ['hi', 'mr', 'bn', 'ta', 'te', 'gu', 'kn', 'ml', 'pa', 'or', 'as', 'ur', 'ne', 'si']
+        
+        # Split text into manageable chunks
+        if len(text) > 4500:  # Google Translate has character limits
+            chunks = [text[i:i+4500] for i in range(0, len(text), 4500)]
+            translated_chunks = []
+            
+            for chunk in chunks:
                 try:
-                    result = translator.translate(sentence, dest=target_language)
-                    translated_sentences.append(result.text)
-                except:
-                    translated_sentences.append(sentence)  # Fallback to original
-        
-        return " ".join(translated_sentences)
+                    result = translator.translate(chunk, dest=target_language)
+                    translated_chunks.append(result.text)
+                except Exception as e:
+                    print(f"Translation error for chunk: {e}")
+                    translated_chunks.append(chunk)  # Fallback to original
+            
+            return " ".join(translated_chunks)
+        else:
+            # Translate full text
+            try:
+                result = translator.translate(text, dest=target_language)
+                return result.text
+            except Exception as e:
+                print(f"Translation error: {e}")
+                return text  # Return original text if translation fails
+                
     except Exception as e:
-        print(f"Translation error: {e}")
+        print(f"Translation service error: {e}")
         return text  # Return original text if translation fails
+
+def translate_risk_recommendations(recommendations: list, target_language: str) -> list:
+    """Translate risk recommendations to target language."""
+    try:
+        if target_language == 'en':
+            return recommendations
+        
+        translated_recs = []
+        for rec in recommendations:
+            translated_rec = translate_text(rec, target_language)
+            translated_recs.append(translated_rec)
+        
+        return translated_recs
+    except Exception as e:
+        print(f"Error translating recommendations: {e}")
+        return recommendations
 
 def analyze_risk(text: str):
     """Perform risk analysis using zero-shot classification."""
@@ -913,10 +1017,25 @@ async def analyze_url(data: URLInput):
 
 @app.get("/supported_languages")
 async def get_supported_languages():
-    """Get list of supported languages for translation."""
+    """Get list of supported languages for translation with focus on Indian languages."""
     return {
         "languages": {
             "en": "English",
+            "hi": "Hindi (हिंदी)",
+            "mr": "Marathi (मराठी)",
+            "bn": "Bengali (বাংলা)",
+            "ta": "Tamil (தமிழ்)",
+            "te": "Telugu (తెలుగు)",
+            "gu": "Gujarati (ગુજરાતી)",
+            "kn": "Kannada (ಕನ್ನಡ)",
+            "ml": "Malayalam (മലയാളം)",
+            "pa": "Punjabi (ਪੰਜਾਬੀ)",
+            "or": "Odia (ଓଡ଼ିଆ)",
+            "as": "Assamese (অসমীয়া)",
+            "ur": "Urdu (اردو)",
+            "ne": "Nepali (नेपाली)",
+            "si": "Sinhala (සිංහල)",
+            "my": "Myanmar (မြန်မာ)",
             "es": "Spanish",
             "fr": "French",
             "de": "German",
@@ -927,11 +1046,26 @@ async def get_supported_languages():
             "ko": "Korean",
             "zh": "Chinese",
             "ar": "Arabic",
-            "hi": "Hindi",
             "nl": "Dutch",
             "sv": "Swedish",
             "da": "Danish",
             "no": "Norwegian",
             "fi": "Finnish"
+        },
+        "indian_languages": {
+            "hi": "Hindi (हिंदी)",
+            "mr": "Marathi (मराठी)",
+            "bn": "Bengali (বাংলা)",
+            "ta": "Tamil (தமிழ்)",
+            "te": "Telugu (తెలుగు)",
+            "gu": "Gujarati (ગુજરાતી)",
+            "kn": "Kannada (ಕನ್ನಡ)",
+            "ml": "Malayalam (മലയാളം)",
+            "pa": "Punjabi (ਪੰਜਾਬੀ)",
+            "or": "Odia (ଓଡ଼ିଆ)",
+            "as": "Assamese (অসমীয়া)",
+            "ur": "Urdu (اردو)",
+            "ne": "Nepali (नेपाली)",
+            "si": "Sinhala (සිංහල)"
         }
     }

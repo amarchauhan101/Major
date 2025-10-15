@@ -50,7 +50,6 @@ class Summary(BaseModel):
     word_count: int
     estimated_reading_time: int
     readability_score: str
-    structured_analysis: Dict[str, str]  # New structured format
 
 class AnalysisResponse(BaseModel):
     success: bool
@@ -258,127 +257,6 @@ def calculate_readability(content: str) -> str:
     else:
         return "Easy"
 
-def build_structured_analysis(content: str) -> Dict[str, str]:
-    """Build structured analysis in user-friendly format"""
-    content_lower = content.lower()
-    
-    # Extract key information for each section
-    structured = {
-        "summary": "This website's terms outline the basic service agreement and user responsibilities.",
-        "key_points": extract_key_points_text(content),
-        "data_collected": extract_data_collection_info(content_lower),
-        "data_usage": extract_data_usage_info(content_lower),
-        "data_sharing": extract_data_sharing_info(content_lower),
-        "user_rights": extract_user_rights_info(content_lower),
-        "company_rights": extract_company_rights_info(content_lower),
-        "termination": extract_termination_info(content_lower),
-        "liability": extract_liability_info(content_lower),
-        "dispute_resolution": extract_dispute_resolution_info(content_lower),
-        "cookies_tracking": extract_cookies_info(content_lower),
-        "privacy_protection": extract_privacy_protection_info(content_lower)
-    }
-    
-    return structured
-
-def extract_key_points_text(content: str) -> str:
-    """Extract key points as readable text"""
-    key_points = extract_key_points(content)
-    if key_points:
-        return "• " + " • ".join(key_points[:3])  # Top 3 points
-    return "Key terms include service usage guidelines, user responsibilities, and data handling practices."
-
-def extract_data_collection_info(content_lower: str) -> str:
-    """Extract data collection information"""
-    if any(term in content_lower for term in ["personal information", "user data", "collect data"]):
-        if "email" in content_lower and "name" in content_lower:
-            return "Collects personal information including name, email address, and contact details."
-        elif "email" in content_lower:
-            return "Collects email addresses and basic contact information."
-        else:
-            return "Collects personal information as specified in their privacy policy."
-    return "Data collection practices are outlined in their privacy policy."
-
-def extract_data_usage_info(content_lower: str) -> str:
-    """Extract data usage information"""
-    if "marketing" in content_lower and "advertising" in content_lower:
-        return "Uses collected data for marketing, advertising, and service improvement."
-    elif "marketing" in content_lower:
-        return "Uses data for marketing purposes and service enhancement."
-    elif "service" in content_lower and "improve" in content_lower:
-        return "Uses data to improve services and user experience."
-    return "Uses collected data to provide and improve services."
-
-def extract_data_sharing_info(content_lower: str) -> str:
-    """Extract data sharing information"""
-    if "third party" in content_lower or "third-party" in content_lower:
-        if "partner" in content_lower:
-            return "Shares data with third-party partners and service providers."
-        else:
-            return "May share data with third parties as outlined in their privacy policy."
-    elif "share" in content_lower and "data" in content_lower:
-        return "Has provisions for sharing user data under certain circumstances."
-    return "Data sharing practices are detailed in their privacy policy."
-
-def extract_user_rights_info(content_lower: str) -> str:
-    """Extract user rights information"""
-    if "delete" in content_lower and "account" in content_lower:
-        return "Users can delete their accounts and request data removal."
-    elif "opt out" in content_lower or "unsubscribe" in content_lower:
-        return "Users have rights to opt out of certain data uses and communications."
-    elif "access" in content_lower and "data" in content_lower:
-        return "Users have rights to access and control their personal data."
-    return "User rights are outlined in accordance with applicable privacy laws."
-
-def extract_company_rights_info(content_lower: str) -> str:
-    """Extract company rights information"""
-    if "terminate" in content_lower and "account" in content_lower:
-        return "Company reserves the right to terminate accounts for policy violations."
-    elif "suspend" in content_lower:
-        return "Company can suspend or restrict access to services."
-    elif "modify" in content_lower and "terms" in content_lower:
-        return "Company can modify terms and conditions with notice to users."
-    return "Company reserves standard rights to manage the service and user accounts."
-
-def extract_termination_info(content_lower: str) -> str:
-    """Extract termination information"""
-    if "cancel" in content_lower and "any time" in content_lower:
-        return "Users can cancel their accounts at any time."
-    elif "terminate" in content_lower:
-        return "Either party can terminate the agreement under specified conditions."
-    return "Termination policies are outlined in the terms and conditions."
-
-def extract_liability_info(content_lower: str) -> str:
-    """Extract liability information"""
-    if "not responsible" in content_lower or "not liable" in content_lower:
-        return "Company limits liability for damages and service interruptions."
-    elif "disclaimer" in content_lower:
-        return "Service is provided 'as is' with standard disclaimers."
-    return "Liability limitations are specified in accordance with applicable law."
-
-def extract_dispute_resolution_info(content_lower: str) -> str:
-    """Extract dispute resolution information"""
-    if "arbitration" in content_lower:
-        return "Disputes are resolved through binding arbitration."
-    elif "court" in content_lower and "jurisdiction" in content_lower:
-        return "Disputes are resolved in specified courts and jurisdictions."
-    return "Dispute resolution procedures are outlined in the terms."
-
-def extract_cookies_info(content_lower: str) -> str:
-    """Extract cookies and tracking information"""
-    if "cookies" in content_lower and "tracking" in content_lower:
-        return "Uses cookies and tracking technologies for analytics and personalization."
-    elif "cookies" in content_lower:
-        return "Uses cookies to enhance user experience and analyze site usage."
-    return "Cookie usage is detailed in their privacy policy."
-
-def extract_privacy_protection_info(content_lower: str) -> str:
-    """Extract privacy protection information"""
-    if "gdpr" in content_lower or "ccpa" in content_lower:
-        return "Complies with GDPR, CCPA, and other privacy regulations."
-    elif "privacy" in content_lower and "protect" in content_lower:
-        return "Implements measures to protect user privacy and data security."
-    return "Privacy protection measures are outlined in their privacy policy."
-
 def translate_content(content: str, target_language: str) -> str:
     """Simple translation simulation (in real implementation, use Google Translate API)"""
     if target_language == "en":
@@ -438,7 +316,7 @@ async def analyze_terms(request: AnalysisRequest):
         reading_time = max(1, word_count // 200)  # Assume 200 words per minute
         readability = calculate_readability(content)
         
-        # Create summary with structured analysis
+        # Create summary
         summary_data = Summary(
             executive_summary=create_summary(content),
             key_points=key_points,
@@ -446,8 +324,7 @@ async def analyze_terms(request: AnalysisRequest):
             categories=categories,
             word_count=word_count,
             estimated_reading_time=reading_time,
-            readability_score=readability,
-            structured_analysis=build_structured_analysis(content)
+            readability_score=readability
         )
         
         response_data = {

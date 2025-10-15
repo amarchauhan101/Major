@@ -164,8 +164,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         request.action.includes('cookie') || 
         request.action === 'scanCookies' ||
         request.action === 'classifyCookie' ||
-        request.action === 'blockTrackingCookies'||
-        request.action === 'acceptEssentialCookies'
+        request.action === 'blockTrackingCookies'
     )) {
         console.log('🍪 Handling Cookie Guard functionality');
         handleCookieGuard(request, sender, sendResponse);
@@ -316,18 +315,12 @@ async function handleCookieGuard(request, sender, sendResponse) {
 
     // Update cookie settings
     if (request.action === "updateCookieSetting") {
-        console.log("🍪 Processing updateCookieSetting request...");
-        
-        updateCookieSetting(request.cookieName, request.cookieDomain, request.isAllowed)
-            .then(result => {
-                console.log("✅ Cookie setting updated successfully:", result);
-                sendResponse({ success: true, data: result });
-            })
-            .catch(error => {
-                console.error("❌ Error updating cookie setting:", error);
-                sendResponse({ success: false, error: error.message });
-            });
-        return true; // Keep message channel open for async response
+        const key = `${request.cookieName}|${request.cookieDomain}`;
+        chrome.storage.local.set({ [key]: request.isAllowed }, () => {
+            console.log(`⚙️ Updated setting for ${key}: ${request.isAllowed}`);
+            sendResponse({ success: true });
+        });
+        return;
     }
 
     // Remove tracking cookies
@@ -361,34 +354,39 @@ async function handleCookieGuard(request, sender, sendResponse) {
 
     // Accept only essential cookies
     if (request.action === "acceptEssentialCookies") {
-        console.log("🍪 Processing acceptEssentialCookies request...");
-        
-        acceptEssentialCookies(request.url)
-            .then(result => {
-                console.log("✅ Essential cookies accepted successfully:", result);
-                sendResponse({ success: true, data: result });
-            })
-            .catch(error => {
-                console.error("❌ Error accepting essential cookies:", error);
-                sendResponse({ success: false, error: error.message });
+        chrome.cookies.getAll({ url: request.url }, (cookies) => {
+            cookies.forEach(cookie => {
+                const classification = aiClassifyCookie(cookie.name, cookie.domain);
+                const isEssential = isEssentialCookie(cookie.name, classification.purpose);
+                
+                if (!isEssential) {
+                    const domain = cookie.domain.startsWith(".") ? cookie.domain.substring(1) : cookie.domain;
+                    const protocol = cookie.secure ? "https:" : "http:";
+                    const url = `${protocol}//${domain}${cookie.path}`;
+                    
+                    chrome.cookies.remove({ url, name: cookie.name }, (details) => {
+                        if (!chrome.runtime.lastError) {
+                            console.log(`✅ Removed non-essential cookie: ${cookie.name}`);
+                        }
+                    });
+                }
             });
-        return true; // Keep message channel open for async response
+            
+            sendResponse({ success: true, message: "Non-essential cookies removed" });
+        });
+        return;
     }
 
     // Accept all cookies (just store preference)
     if (request.action === "acceptAllCookies") {
-        console.log("🍪 Processing acceptAllCookies request...");
-        
-        acceptAllCookies()
-            .then(result => {
-                console.log("✅ All cookies accepted successfully:", result);
-                sendResponse({ success: true, data: result });
-            })
-            .catch(error => {
-                console.error("❌ Error accepting all cookies:", error);
-                sendResponse({ success: false, error: error.message });
-            });
-        return true; // Keep message channel open for async response
+        chrome.storage.local.set({ 
+            cookiePreference: 'all',
+            lastUpdated: Date.now()
+        }, () => {
+            console.log("✅ User accepted all cookies");
+            sendResponse({ success: true, message: "All cookies accepted" });
+        });
+        return;
     }
 
     sendResponse({ success: false, error: 'Unknown cookie action' });
@@ -481,22 +479,16 @@ async function handleTermsAI(request, sender, sendResponse) {
         case 'analyze_content':
             // Handle content analysis (original Terms AI functionality)
             if (isProcessing) {
-                console.log('⚠️ Analysis already in progress, queuing request...');
-                sendResponse({ success: false, error: 'Analysis already in progress. Please wait and try again.' });
+                sendResponse({ success: false, error: 'Analysis already in progress' });
                 return;
             }
 
             try {
                 isProcessing = true;
-                console.log('🚀 Starting content analysis...');
                 
                 const { content, url, language = 'en' } = request;
                 console.log(`🔍 Analyzing content from: ${url} (Language: ${language})`);
                 console.log(`📄 Content length: ${content.length} characters`);
-
-                if (!content || content.length < 100) {
-                    throw new Error('Insufficient content for analysis');
-                }
 
                 const cacheKey = generateCacheKey(content + language);
                 if (analysisCache.has(cacheKey)) {
@@ -505,23 +497,6 @@ async function handleTermsAI(request, sender, sendResponse) {
                     await storeAnalysis(cachedResult, url);
                     sendResponse({ success: true, data: cachedResult });
                     return;
-                }
-
-                // Check backend health first
-                console.log('🏥 Checking backend health...');
-                try {
-                    const healthResponse = await fetch(`${BACKEND_URL}/health`, {
-                        method: 'GET',
-                        timeout: 5000
-                    });
-                    
-                    if (!healthResponse.ok) {
-                        throw new Error(`Backend health check failed: ${healthResponse.status}`);
-                    }
-                    console.log('✅ Backend is healthy');
-                } catch (healthError) {
-                    console.error('❌ Backend health check failed:', healthError);
-                    throw new Error('Backend server is not running. Please start it with: python main_simple.py');
                 }
 
                 const analysisResult = await analyzeWithBackend(content, language);
@@ -543,7 +518,6 @@ async function handleTermsAI(request, sender, sendResponse) {
                 sendResponse({ success: false, error: error.message });
             } finally {
                 isProcessing = false;
-                console.log('🔓 Analysis lock released');
             }
             break;
             
@@ -778,143 +752,4 @@ function generateCacheKey(content) {
         hash = hash & hash;
     }
     return hash.toString();
-}
-
-// ============================================================
-// 🍪 Cookie Management Functions
-// ============================================================
-
-async function acceptEssentialCookies(url) {
-    try {
-        console.log("🍪 Accepting essential cookies only for:", url);
-        
-        // Get all cookies for the domain
-        const domain = new URL(url).hostname;
-        const cookies = await chrome.cookies.getAll({ domain: domain });
-        
-        console.log(`📊 Found ${cookies.length} cookies for domain: ${domain}`);
-        
-        let removedCount = 0;
-        let essentialCount = 0;
-        
-        for (const cookie of cookies) {
-            // Keep essential cookies, remove others
-            if (isEssentialCookie(cookie)) {
-                essentialCount++;
-                console.log(`✅ Keeping essential cookie: ${cookie.name}`);
-            } else {
-                try {
-                    const removeUrl = `https://${cookie.domain}${cookie.path}`;
-                    await chrome.cookies.remove({
-                        url: removeUrl,
-                        name: cookie.name
-                    });
-                    removedCount++;
-                    console.log(`🗑️ Removed non-essential cookie: ${cookie.name}`);
-                } catch (error) {
-                    console.warn("Failed to remove cookie:", cookie.name, error);
-                }
-            }
-        }
-        
-        console.log(`✅ Cookie cleanup complete: ${removedCount} removed, ${essentialCount} kept`);
-        return { 
-            removedCount, 
-            essentialCount,
-            totalCookies: cookies.length,
-            domain: domain
-        };
-        
-    } catch (error) {
-        console.error("Error in acceptEssentialCookies:", error);
-        throw error;
-    }
-}
-
-async function acceptAllCookies() {
-    try {
-        console.log("🍪 Accepting all cookies");
-        
-        // Store user preference
-        await chrome.storage.local.set({
-            cookiePreference: 'accept_all',
-            timestamp: Date.now()
-        });
-        
-        return { message: "All cookies accepted" };
-        
-    } catch (error) {
-        console.error("Error in acceptAllCookies:", error);
-        throw error;
-    }
-}
-
-async function updateCookieSetting(cookieName, cookieDomain, isAllowed) {
-    try {
-        console.log(`🍪 Updating cookie setting: ${cookieName} = ${isAllowed}`);
-        
-        if (!isAllowed) {
-            // Remove the cookie
-            try {
-                await chrome.cookies.remove({
-                    url: `https://${cookieDomain}`,
-                    name: cookieName
-                });
-                console.log(`✅ Removed cookie: ${cookieName}`);
-            } catch (error) {
-                console.warn("Failed to remove cookie:", cookieName, error);
-            }
-        }
-        
-        // Store user preference
-        const preferences = await chrome.storage.local.get(['cookiePreferences']) || {};
-        const cookiePreferences = preferences.cookiePreferences || {};
-        cookiePreferences[`${cookieDomain}:${cookieName}`] = isAllowed;
-        
-        await chrome.storage.local.set({
-            cookiePreferences: cookiePreferences,
-            timestamp: Date.now()
-        });
-        
-        return { success: true };
-        
-    } catch (error) {
-        console.error("Error in updateCookieSetting:", error);
-        throw error;
-    }
-}
-
-function isEssentialCookie(cookie) {
-    // Define essential cookie patterns
-    const essentialPatterns = [
-        'session', 'auth', 'login', 'token', 'csrf', 'security',
-        'user', 'account', 'preference', 'language', 'theme',
-        'cart', 'checkout', 'payment', 'order'
-    ];
-    
-    const cookieName = cookie.name.toLowerCase();
-    
-    // Check if cookie name matches essential patterns
-    for (const pattern of essentialPatterns) {
-        if (cookieName.includes(pattern)) {
-            return true;
-        }
-    }
-    
-    // Check if it's a session cookie (no expiration)
-    if (!cookie.expirationDate) {
-        return true;
-    }
-    
-    // Check if it's a first-party cookie for essential functionality
-    if (!cookie.name.includes('_ga') && 
-        !cookie.name.includes('_gid') && 
-        !cookie.name.includes('_fb') &&
-        !cookie.name.includes('analytics') &&
-        !cookie.name.includes('tracking') &&
-        !cookie.name.includes('marketing')) {
-        return true;
-    }
-    
-    return false;
 }

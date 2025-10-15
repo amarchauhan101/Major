@@ -265,7 +265,33 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         action: "showCookieReport",
         cookies: classified,
       });
+
+      sendResponse({ success: true, cookieCount: cookies.length });
     });
+    return true;
+  }
+
+  // New: Handle Terms Analysis with Language Support
+  if (request.action === "analyzeTerms") {
+    analyzeTermsWithLanguage(request.url, request.language || 'en', sendResponse);
+    return true;
+  }
+
+  // New: Handle Full Privacy Analysis with Language Support
+  if (request.action === "fullPrivacyAnalysis") {
+    performFullPrivacyAnalysis(request.url, request.language || 'en', sendResponse);
+    return true;
+  }
+
+  // New: Extract Terms from URL
+  if (request.action === "extractTermsFromUrl") {
+    extractAndAnalyzeTermsFromUrl(request.url, request.language || 'en', sendResponse);
+    return true;
+  }
+
+  // New: Summarize Terms with Language Support
+  if (request.action === "summarizeTerms") {
+    summarizeTermsText(request.text, request.language || 'en', request.metadata, sendResponse);
     return true;
   }
 
@@ -294,6 +320,228 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log("Accepting all cookies");
   }
 });
+
+// New: Analyze Terms with Language Support
+async function analyzeTermsWithLanguage(url, language, sendResponse) {
+  try {
+    console.log(`🔍 Analyzing terms for URL: ${url} in language: ${language}`);
+    
+    // First try to extract terms from the current page
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    const currentTab = tabs[0];
+    
+    // Inject content script to extract terms
+    const results = await chrome.tabs.executeScript(currentTab.id, {
+      code: `
+        const extractor = new TermsExtractor();
+        const termsMatch = extractor.findTermsAndConditions();
+        termsMatch ? termsMatch.text : null;
+      `
+    });
+    
+    let termsText = results && results[0];
+    
+    if (!termsText || termsText.length < 200) {
+      sendResponse({ 
+        success: false, 
+        error: "No Terms & Conditions found on this page." 
+      });
+      return;
+    }
+
+    // Call backend API with language parameter
+    const response = await fetch('http://localhost:8000/analyze_text', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        text: termsText,
+        language: language
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status}`);
+    }
+
+    const analysisData = await response.json();
+    
+    sendResponse({ 
+      success: true, 
+      data: analysisData 
+    });
+
+  } catch (error) {
+    console.error('Terms analysis error:', error);
+    sendResponse({ 
+      success: false, 
+      error: error.message || "Analysis failed. Please ensure the backend server is running." 
+    });
+  }
+}
+
+// New: Perform Full Privacy Analysis
+async function performFullPrivacyAnalysis(url, language, sendResponse) {
+  try {
+    console.log(`🚀 Starting full privacy analysis for: ${url} in language: ${language}`);
+    
+    // Get current tab and extract terms
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    const currentTab = tabs[0];
+    
+    // Extract terms from page
+    const termsResults = await chrome.tabs.executeScript(currentTab.id, {
+      code: `
+        const extractor = new TermsExtractor();
+        const termsMatch = extractor.findTermsAndConditions();
+        const pageMetadata = extractor.extractPageMetadata();
+        ({
+          termsText: termsMatch ? termsMatch.text : null,
+          metadata: pageMetadata
+        });
+      `
+    });
+    
+    const { termsText, metadata } = termsResults && termsResults[0] || {};
+    
+    // Get cookies
+    const cookies = await new Promise((resolve) => {
+      chrome.cookies.getAll({ url }, (cookies) => {
+        const classified = cookies.map((cookie) => {
+          const currentHost = new URL(url).hostname;
+          const isThirdParty = !cookie.domain.includes(currentHost);
+          const classification = aiClassifyCookie(cookie.name, cookie.domain);
+          return {
+            name: cookie.name,
+            domain: cookie.domain,
+            purpose: classification.purpose,
+            riskLevel: classification.riskLevel,
+            isThirdParty,
+            isEssential: isEssentialCookie(cookie.name),
+          };
+        });
+        resolve(classified);
+      });
+    });
+
+    let analysisData = {
+      cookieCount: cookies.length,
+      cookies: cookies,
+      metadata: metadata
+    };
+
+    // If we have terms text, analyze it
+    if (termsText && termsText.length > 200) {
+      const response = await fetch('http://localhost:8000/analyze_text', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: termsText,
+          language: language
+        })
+      });
+
+      if (response.ok) {
+        const apiData = await response.json();
+        analysisData = { ...analysisData, ...apiData };
+      }
+    }
+
+    sendResponse({ 
+      success: true, 
+      data: analysisData 
+    });
+
+  } catch (error) {
+    console.error('Full privacy analysis error:', error);
+    sendResponse({ 
+      success: false, 
+      error: error.message || "Full analysis failed. Please try again." 
+    });
+  }
+}
+
+// New: Extract and Analyze Terms from URL
+async function extractAndAnalyzeTermsFromUrl(termsUrl, language, sendResponse) {
+  try {
+    console.log(`📄 Extracting terms from URL: ${termsUrl} in language: ${language}`);
+    
+    // Call backend API to analyze URL directly
+    const response = await fetch('http://localhost:8000/analyze_url', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        url: termsUrl,
+        language: language
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status}`);
+    }
+
+    const analysisData = await response.json();
+    
+    sendResponse({ 
+      success: true, 
+      data: analysisData 
+    });
+
+  } catch (error) {
+    console.error('URL terms analysis error:', error);
+    sendResponse({ 
+      success: false, 
+      error: error.message || "URL analysis failed." 
+    });
+  }
+}
+
+// New: Summarize Terms Text with Language Support
+async function summarizeTermsText(text, language, metadata, sendResponse) {
+  try {
+    console.log(`📝 Summarizing terms text in language: ${language}`);
+    
+    // Call backend API with text and language
+    const response = await fetch('http://localhost:8000/analyze_text', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        text: text,
+        language: language
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status}`);
+    }
+
+    const analysisData = await response.json();
+    
+    // Add metadata if available
+    if (metadata) {
+      analysisData.metadata = { ...analysisData.metadata, ...metadata };
+    }
+    
+    sendResponse({ 
+      success: true, 
+      data: analysisData 
+    });
+
+  } catch (error) {
+    console.error('Terms summarization error:', error);
+    sendResponse({ 
+      success: false, 
+      error: error.message || "Text summarization failed." 
+    });
+  }
+}
 
 
 

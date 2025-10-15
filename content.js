@@ -299,155 +299,61 @@ class TermsExtractor {
 // Initialize extractor
 const termsExtractor = new TermsExtractor();
 
-// Auto-analysis on page visit
-function performAutoAnalysis() {
-  console.log("🔍 Starting auto-analysis for:", window.location.href);
+// Wait for page to load, then extract and analyze
+setTimeout(() => {
+  console.log("🔍 Starting cookie and terms analysis...");
 
-  // 1. Always trigger cookie scan
+  // 1. Trigger cookie scan (existing functionality)
   chrome.runtime.sendMessage({
     action: "scanCookies",
     url: window.location.href,
   });
 
-  // 2. Check for terms links first
-  const termsLinks = findTermsLinks();
+  // 2. Extract and analyze terms & conditions
   const pageMetadata = termsExtractor.extractPageMetadata();
   const userLanguage = termsExtractor.getUserLanguage();
 
   console.log("📄 Page metadata:", pageMetadata);
   console.log("🌍 User language:", userLanguage);
 
-  if (termsLinks.length > 0) {
-    console.log("🔗 Found terms links:", termsLinks);
-    // Analyze the best terms link
-    analyzeTermsLink(termsLinks[0], userLanguage, pageMetadata);
-  } else {
-    // No terms links found, analyze current page
-    console.log("📄 No terms links found, analyzing current page content");
-    analyzeCurrentPage(userLanguage, pageMetadata);
-  }
-}
-
-function analyzeTermsLink(linkUrl, language, metadata) {
-  console.log("🔍 Analyzing terms link:", linkUrl);
-  
-  // Try to fetch content from the terms page
-  fetch(linkUrl)
-    .then(response => {
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      return response.text();
-    })
-    .then(html => {
-      // Parse HTML and extract text content
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      const content = extractCleanText(doc.body);
-      
-      if (content && content.length > 200) {
-        console.log("✅ Successfully extracted terms content from link");
-        sendForAnalysis(content, linkUrl, language, metadata);
-      } else {
-        console.log("⚠️ Insufficient content from terms link, falling back to current page");
-        analyzeCurrentPage(language, metadata);
-      }
-    })
-    .catch(error => {
-      console.log("❌ Failed to fetch terms link:", error.message);
-      console.log("📄 Falling back to current page analysis");
-      analyzeCurrentPage(language, metadata);
-    });
-}
-
-function analyzeCurrentPage(language, metadata) {
-  console.log("📄 Analyzing current page content");
+  let termsText = "";
 
   // Try to find terms content on current page
   const termsMatch = termsExtractor.findTermsAndConditions();
-  
-  let termsText = "";
 
   if (termsMatch) {
     console.log("✅ Found terms content with score:", termsMatch.score);
     termsText = termsMatch.text;
   } else {
-    // Fallback: use main content
-    termsText = extractMainContent();
-  }
-
-  // Send for analysis if we have sufficient content
-  if (termsText && termsText.length > 200) {
-    console.log("📤 Sending content for analysis");
-    sendForAnalysis(termsText, window.location.href, language, metadata);
+    // Look for terms links and try to fetch content
+    const termsLinks = findTermsLinks();
+    if (termsLinks.length > 0) {
+      console.log("🔗 Found terms links:", termsLinks);
+      // For now, send the first link to background for processing
+      chrome.runtime.sendMessage({
+        action: "extractTermsFromUrl",
+        url: termsLinks[0],
+        language: userLanguage,
+      });
+      return;
     } else {
-    console.log("⚠️ Insufficient terms content found on current page");
+      // Fallback: use page content
+      termsText = document.body.innerText.substring(0, 10000); // Limit size
     }
   }
 
-function sendForAnalysis(content, url, language, metadata) {
+  // Send terms for summarization
+  if (termsText && termsText.length > 200) {
     chrome.runtime.sendMessage({
-    action: "analyze_content",
-    content: content,
-    url: url,
-    language: language,
-    metadata: metadata,
-    autoAnalysis: true // Flag to indicate this is auto-analysis
-  }, (response) => {
-    if (chrome.runtime.lastError) {
-      console.error("❌ Auto-analysis failed:", chrome.runtime.lastError);
-    } else if (response && response.success) {
-      console.log("✅ Auto-analysis completed successfully");
-      // Store the analysis result for the popup to display
-      chrome.storage.local.set({
-        lastAutoAnalysis: {
-          url: url,
-          data: response.data,
-          timestamp: Date.now()
-        }
+      action: "summarizeTerms",
+      text: termsText,
+      language: userLanguage,
+      metadata: pageMetadata,
     });
   } else {
-      console.error("❌ Auto-analysis failed:", response?.error);
-    }
-  });
-}
-
-function extractCleanText(element) {
-  if (!element) return "";
-  
-  // Clone to avoid modifying original
-  const clone = element.cloneNode(true);
-  
-  // Remove scripts, styles, and other non-content elements
-  clone.querySelectorAll('script, style, noscript, nav, header, footer, aside').forEach(el => el.remove());
-  
-  let text = clone.textContent || clone.innerText || "";
-  
-  // Clean up whitespace
-  text = text.replace(/\s+/g, ' ').trim();
-  
-  return text;
-}
-
-function extractMainContent() {
-  const contentSelectors = [
-    'main', 'article', '[role="main"]', '.main-content',
-    '.content', '.page-content', '.post-content', '.entry-content',
-    '#content', '#main', '.container', '.wrapper'
-  ];
-
-  for (const selector of contentSelectors) {
-    const element = document.querySelector(selector);
-    if (element && element.textContent.length > 300) {
-      return extractCleanText(element);
-    }
+    console.log("⚠️ Insufficient terms content found");
   }
-
-  return extractCleanText(document.body);
-}
-
-// Wait for page to load, then perform auto-analysis
-setTimeout(() => {
-  performAutoAnalysis();
-}, 3000); // Reduced delay for faster analysis
+}, 4000); // Delay to ensure page is fully loaded
 
 // Helper function to find terms and conditions links
 function findTermsLinks() {
@@ -1454,138 +1360,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             url: window.location.href,
             title: document.title
         });
-    }
-    
-    // Handle analyze_content action from popup
-    if (request.action === 'analyze_content') {
-        console.log('📋 Analyzing content for terms...');
-        
-        // Extract content from the page
-        const detector = new (class {
-            detectTermsContent() {
-                console.log('🔍 Scanning page for Terms & Conditions...');
-                
-                const pageTitle = document.title.toLowerCase();
-                const pageUrl = window.location.href.toLowerCase();
-                
-                const termsKeywords = [
-                    'terms and conditions', 'terms of service', 'terms of use',
-                    'user agreement', 'service agreement', 'privacy policy',
-                    'end user license', 'acceptable use', 'legal terms',
-                    'terms & conditions', 'tos', 'eula', 'user terms'
-                ];
-                
-                const containsTermsKeywords = (text) => {
-                    return termsKeywords.some(keyword => text.includes(keyword));
-                };
-                
-                if (containsTermsKeywords(pageTitle) || containsTermsKeywords(pageUrl)) {
-                    console.log('✅ T&C page detected via title/URL');
-                    return this.extractMainContent();
-                }
-
-                const tcContainers = this.findTCContainers();
-                if (tcContainers.length > 0) {
-                    console.log('✅ T&C content detected via containers');
-                    return this.extractFromContainers(tcContainers);
-                }
-
-                const mainContent = this.extractMainContent();
-                if (mainContent && mainContent.length > 500) {
-                    console.log('📄 Substantial content found, analyzing...');
-                    return mainContent;
-                }
-
-                console.log('❌ No T&C content detected');
-                return null;
-            }
-            
-            findTCContainers() {
-                const selectors = [
-                    '[class*="terms"]', '[class*="condition"]', '[class*="agreement"]',
-                    '[class*="policy"]', '[class*="legal"]', '[class*="tos"]',
-                    '[id*="terms"]', '[id*="condition"]', '[id*="agreement"]',
-                    '[id*="policy"]', '[id*="legal"]', '[id*="tos"]'
-                ];
-
-                const containers = [];
-                selectors.forEach(selector => {
-                    const elements = document.querySelectorAll(selector);
-                    elements.forEach(el => {
-                        if (el.textContent.length > 200) {
-                            containers.push(el);
-                        }
-                    });
-                });
-
-                return containers;
-            }
-            
-            extractFromContainers(containers) {
-                let content = '';
-                containers.forEach(container => {
-                    content += this.cleanText(container.textContent) + '\n\n';
-                });
-                return content.trim();
-            }
-            
-            extractMainContent() {
-                const contentSelectors = [
-                    'main', 'article', '[role="main"]', '.main-content',
-                    '.content', '.page-content', '.post-content', '.entry-content',
-                    '#content', '#main', '.container', '.wrapper'
-                ];
-
-                for (const selector of contentSelectors) {
-                    const element = document.querySelector(selector);
-                    if (element && element.textContent.length > 300) {
-                        return this.cleanText(element.textContent);
-                    }
-                }
-
-                return this.cleanText(document.body.textContent);
-            }
-            
-            cleanText(text) {
-                return text
-                    .replace(/\s+/g, ' ')
-                    .replace(/\n\s*\n/g, '\n')
-                    .trim();
-            }
-        })();
-        
-        const content = detector.detectTermsContent();
-        
-        if (!content) {
-            sendResponse({
-                success: false,
-                error: 'No terms content found on this page'
-            });
-            return;
-        }
-        
-        console.log('📤 Sending content to background for analysis...');
-        
-        // Send content to background script for analysis
-        chrome.runtime.sendMessage({
-            action: 'analyze_content',
-            content: content,
-            url: window.location.href,
-            language: 'en'
-        }, (response) => {
-            if (chrome.runtime.lastError) {
-                console.error('Error analyzing content:', chrome.runtime.lastError);
-                sendResponse({
-                    success: false,
-                    error: 'Failed to analyze content: ' + chrome.runtime.lastError.message
-                });
-            } else {
-                console.log('✅ Analysis completed, sending response to popup');
-                sendResponse(response);
-            }
-        });
-        
-        return true; // Keep message channel open for async response
     }
 });
 
