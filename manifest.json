@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Privacy Lens - AI Privacy Analyzer",
-  "version": "2.0.0",
-  "description": "Professional privacy protection tool that analyzes cookies and terms & conditions with AI-powered insights. Reveals hidden privacy risks with clear, actionable reports.",
+  "name": "Privacy Protection - Cookie Guard + Terms AI",
+  "version": "1.0.0",
+  "description": "Complete privacy protection combining Cookie Guard for cookie management and Terms AI for intelligent terms analysis",
   
   "icons": {
     "16": "icons/icon16.png",
@@ -18,8 +18,7 @@
     "scripting",
     "notifications",
     "contextMenus",
-    "alarms",
-    "webNavigation"
+    "alarms"
   ],
   
   "host_permissions": [
@@ -35,15 +34,16 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "run_at": "document_end",
-      "all_frames": false
+      "js": [
+        "readability.js",
+        "content.js"
+      ],
+      "run_at": "document_end"
     }
   ],
   
   "action": {
-    "default_popup": "popup/popup.html",
-    "default_title": "Privacy Lens - Analyze Privacy",
+    "default_popup": "popup/popup-unified.html",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",
@@ -55,6 +55,9 @@
     {
       "resources": [
         "cookie_prediction_map.json",
+        "*.html", 
+        "*.css", 
+        "*.js", 
         "icons/*",
         "popup/*"
       ],
