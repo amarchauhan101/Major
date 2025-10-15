@@ -597,6 +597,134 @@ chrome.runtime.onInstalled.addListener(() => {
     });
 });
 
+// Monitor tab updates for automatic analysis
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+    // Only analyze when page is completely loaded
+    if (changeInfo.status === 'complete' && tab.url) {
+        try {
+            // Skip chrome:// and extension pages
+            if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://')) {
+                return;
+            }
+            
+            console.log('🔄 Tab updated, checking for automatic analysis:', tab.url);
+            
+            // Check if we've already analyzed this page recently
+            const result = await chrome.storage.local.get([`analysis_${tabId}`]);
+            if (result[`analysis_${tabId}`]) {
+                const analysis = result[`analysis_${tabId}`];
+                const timeSinceAnalysis = Date.now() - analysis.timestamp;
+                
+                // Only re-analyze if it's been more than 5 minutes
+                if (timeSinceAnalysis < 5 * 60 * 1000) {
+                    console.log('⏭️ Skipping analysis - recently analyzed');
+                    return;
+                }
+            }
+            
+            // Auto-analyze terms for new pages
+            await autoAnalyzePage(tabId, tab.url);
+            
+        } catch (error) {
+            console.error('Error in tab update listener:', error);
+        }
+    }
+});
+
+// Auto-analyze page content
+async function autoAnalyzePage(tabId, url) {
+    try {
+        console.log('🤖 Auto-analyzing page:', url);
+        
+        // Inject content script to extract terms content
+        const results = await chrome.scripting.executeScript({
+            target: { tabId: tabId },
+            function: extractTermsContent
+        });
+        
+        if (results && results[0] && results[0].result) {
+            const content = results[0].result;
+            
+            if (content && content.length > 100) {
+                console.log('📄 Extracted content for analysis:', content.length, 'characters');
+                
+                // Analyze with backend
+                const analysisResult = await analyzeWithBackend(content, 'en');
+                
+                if (analysisResult.success) {
+                    // Store analysis
+                    await chrome.storage.local.set({
+                        [`analysis_${tabId}`]: {
+                            ...analysisResult.data,
+                            timestamp: Date.now(),
+                            language: 'en',
+                            url: url
+                        }
+                    });
+                    
+                    console.log('✅ Auto-analysis completed for:', url);
+                    
+                    // Send notification to popup if it's open
+                    chrome.runtime.sendMessage({
+                        action: 'autoAnalysisComplete',
+                        data: analysisResult.data,
+                        tabId: tabId
+                    }).catch(() => {
+                        // Popup might not be open, ignore error
+                    });
+                    
+                } else {
+                    console.log('⚠️ Auto-analysis failed for:', url);
+                }
+            } else {
+                console.log('ℹ️ No significant content found for analysis');
+            }
+        }
+        
+    } catch (error) {
+        console.error('Error in auto-analyze page:', error);
+    }
+}
+
+// Content extraction function to be injected
+function extractTermsContent() {
+    // Look for terms and conditions content
+    const termsSelectors = [
+        'div[class*="terms"]',
+        'div[class*="conditions"]',
+        'div[class*="privacy"]',
+        'div[id*="terms"]',
+        'div[id*="conditions"]',
+        'div[id*="privacy"]',
+        'main',
+        'article',
+        '.content',
+        '#content'
+    ];
+    
+    let content = '';
+    
+    for (const selector of termsSelectors) {
+        const elements = document.querySelectorAll(selector);
+        for (const element of elements) {
+            const text = element.textContent || element.innerText || '';
+            if (text.length > content.length) {
+                content = text;
+            }
+        }
+    }
+    
+    // If no specific terms content found, get general page content
+    if (content.length < 500) {
+        content = document.body.textContent || document.body.innerText || '';
+    }
+    
+    // Clean up content
+    content = content.replace(/\s+/g, ' ').trim();
+    
+    return content;
+}
+
 // Real-time cookie monitoring (Cookie Guard functionality)
 chrome.cookies.onChanged.addListener((changeInfo) => {
     if (changeInfo.removed) return;

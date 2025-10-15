@@ -214,17 +214,146 @@ async function loadCurrentPageStatus() {
         const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
         const currentTab = tabs[0];
         
-        // Update cookie count (placeholder)
-        document.getElementById('cookie-count').textContent = '0';
+        // Automatically scan cookies for current page
+        await autoScanCookies();
         
         // Check if page has been analyzed
         const result = await chrome.storage.local.get([`analysis_${currentTab.id}`]);
         if (result[`analysis_${currentTab.id}`]) {
             displayPreviousAnalysis(result[`analysis_${currentTab.id}`]);
+            document.getElementById('terms-status').textContent = 'Analyzed';
+        } else {
+            // Automatically analyze terms if not already analyzed
+            await autoAnalyzeTerms();
         }
     } catch (error) {
         console.error('Error loading page status:', error);
     }
+}
+
+// Automatically scan cookies for current page
+async function autoScanCookies() {
+    try {
+        const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+        const currentTab = tabs[0];
+        
+        // Get cookies for current URL (same method as Cookie Guard)
+        const cookies = await chrome.cookies.getAll({ url: currentTab.url });
+        document.getElementById('cookie-count').textContent = cookies.length.toString();
+        
+        console.log(`🍪 Auto-scanned ${cookies.length} cookies for ${currentTab.url}`);
+        
+        // Store cookie count for later use
+        await chrome.storage.local.set({
+            [`cookies_${currentTab.id}`]: {
+                count: cookies.length,
+                timestamp: Date.now(),
+                domain: new URL(currentTab.url).hostname
+            }
+        });
+        
+    } catch (error) {
+        console.error('Error auto-scanning cookies:', error);
+        document.getElementById('cookie-count').textContent = '0';
+    }
+}
+
+// Automatically analyze terms for current page
+async function autoAnalyzeTerms() {
+    try {
+        const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+        const currentTab = tabs[0];
+        
+        // Update status to analyzing
+        document.getElementById('terms-status').textContent = 'Analyzing...';
+        
+        // Extract content from the current page
+        const results = await chrome.scripting.executeScript({
+            target: { tabId: currentTab.id },
+            function: extractTermsContent
+        });
+        
+        if (results && results[0] && results[0].result) {
+            const content = results[0].result;
+            
+            if (content && content.length > 100) {
+                console.log('📄 Extracted content for auto-analysis:', content.length, 'characters');
+                
+                // Send message to background script for terms analysis
+                const response = await chrome.runtime.sendMessage({
+                    action: 'analyze_content',
+                    content: content,
+                    url: currentTab.url,
+                    language: currentLanguage
+                });
+                
+                if (response && response.success) {
+                    displayAnalysisResult(response.data);
+                    document.getElementById('terms-status').textContent = 'Analyzed';
+                    
+                    // Save analysis for later
+                    await chrome.storage.local.set({
+                        [`analysis_${currentTab.id}`]: {
+                            ...response.data,
+                            timestamp: Date.now(),
+                            language: currentLanguage
+                        }
+                    });
+                } else {
+                    document.getElementById('terms-status').textContent = 'Ready';
+                    console.log('Terms analysis failed or no terms found');
+                }
+            } else {
+                document.getElementById('terms-status').textContent = 'Ready';
+                console.log('No significant content found for analysis');
+            }
+        } else {
+            document.getElementById('terms-status').textContent = 'Ready';
+            console.log('Failed to extract content from page');
+        }
+    } catch (error) {
+        console.error('Error auto-analyzing terms:', error);
+        document.getElementById('terms-status').textContent = 'Ready';
+    }
+}
+
+// Content extraction function (same as in background script)
+function extractTermsContent() {
+    // Look for terms and conditions content
+    const termsSelectors = [
+        'div[class*="terms"]',
+        'div[class*="conditions"]',
+        'div[class*="privacy"]',
+        'div[id*="terms"]',
+        'div[id*="conditions"]',
+        'div[id*="privacy"]',
+        'main',
+        'article',
+        '.content',
+        '#content'
+    ];
+    
+    let content = '';
+    
+    for (const selector of termsSelectors) {
+        const elements = document.querySelectorAll(selector);
+        for (const element of elements) {
+            const text = element.textContent || element.innerText || '';
+            if (text.length > content.length) {
+                content = text;
+            }
+        }
+    }
+    
+    // If no specific terms content found, get general page content
+    if (content.length < 500) {
+        content = document.body.textContent || document.body.innerText || '';
+    }
+    
+    // Clean up content
+    content = content.replace(/\s+/g, ' ').trim();
+    
+    return content;
 }
 
 // Cookie Guard functions
@@ -424,6 +553,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         displayAnalysisResult(message.data);
     } else if (message.action === 'analysisError') {
         showError(message.error);
+    } else if (message.action === 'autoAnalysisComplete') {
+        // Handle automatic analysis completion
+        displayAnalysisResult(message.data);
+        document.getElementById('terms-status').textContent = 'Analyzed';
+        console.log('✅ Auto-analysis completed and displayed');
     }
 });
 

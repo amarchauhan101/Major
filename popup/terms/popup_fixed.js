@@ -5,7 +5,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const backBtn = document.getElementById('backBtn-ai-analyzer');
     backBtn.addEventListener("click", () => {
-        window.location.href = 'popup-multilingual.html';
+        window.location.href = '../popup-multilingual.html';
     })
 
     // Get DOM elements
