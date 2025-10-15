@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Guard + Terms AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 380px;
+            min-height: 500px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            margin: 8px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            min-height: 484px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .extension-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .extension-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .extension-card:last-child {
+            margin-bottom: 0;
+            border-left-color: #764ba2;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .card-icon {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .card-description {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        .card-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e9ecef;
+            color: #495057;
+            border: 1px solid #dee2e6;
+        }
+
+        .btn-secondary:hover {
+            background: #dee2e6;
+        }
+
+        .unified-actions {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f0f7ff 100%);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .unified-actions h3 {
+            font-size: 14px;
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .status-item {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+
+        .status-label {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .status-value {
+            font-size: 12px;
+            font-weight: 700;
+            color: #28a745;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 10px;
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ Privacy Protection Suite</h1>
+            <p>Cookie Guard + Terms AI Extension</p>
+        </div>
+
+        <div class="content">
+            <!-- Cookie Guard Extension -->
+            <div class="extension-card" id="cookie-guard-card">
+                <div class="card-header">
+                    <div class="card-icon">🍪</div>
+                    <div class="card-title">Cookie Guard</div>
+                </div>
+                <div class="card-description">
+                    Analyze and manage cookies on this page with AI-powered classification and privacy protection.
+                </div>
+                <div class="card-buttons">
+                    <button class="btn btn-primary" id="open-cookie-guard">Open Cookie Guard</button>
+                    <button class="btn btn-secondary" id="scan-cookies">Quick Scan</button>
+                </div>
+            </div>
+
+            <!-- Terms AI Extension -->
+            <div class="extension-card" id="terms-ai-card">
+                <div class="card-header">
+                    <div class="card-icon">📋</div>
+                    <div class="card-title">Terms AI</div>
+                </div>
+                <div class="card-description">
+                    AI-powered analysis of Terms & Conditions with smart summarization and risk assessment.
+                </div>
+                <div class="card-buttons">
+                    <button class="btn btn-primary" id="open-terms-ai">Open Terms AI</button>
+                    <button class="btn btn-secondary" id="analyze-terms">Quick Analysis</button>
+                </div>
+            </div>
+
+            <!-- Unified Actions -->
+            <div class="unified-actions">
+                <h3>🚀 Combined Actions</h3>
+                <div class="card-buttons">
+                    <button class="btn btn-primary" id="full-analysis">Full Privacy Analysis</button>
+                </div>
+                
+                <div class="status-grid">
+                    <div class="status-item">
+                        <div class="status-label">Cookies</div>
+                        <div class="status-value" id="cookie-count">0</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Terms Status</div>
+                        <div class="status-value" id="terms-status">Ready</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Processing...</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            Cookie Guard + Terms AI • Privacy Protection Suite
+        </div>
+    </div>
+
+    <script src="popup-unified.js"></script>
+</body>
+</html>

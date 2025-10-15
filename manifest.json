@@ -1,0 +1,72 @@
+{
+  "manifest_version": 3,
+  "name": "Privacy Protection - Cookie Guard + Terms AI",
+  "version": "1.0.0",
+  "description": "Complete privacy protection combining Cookie Guard for cookie management and Terms AI for intelligent terms analysis",
+  
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  
+  "permissions": [
+    "cookies",
+    "storage", 
+    "activeTab",
+    "tabs",
+    "scripting",
+    "notifications",
+    "contextMenus",
+    "alarms"
+  ],
+  
+  "host_permissions": [
+    "<all_urls>",
+    "http://localhost:*/*"
+  ],
+  
+  "background": {
+    "service_worker": "background-unified.js",
+    "type": "module"
+  },
+  
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "readability.js",
+        "content.js"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  
+  "action": {
+    "default_popup": "popup/popup-multilingual.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "cookie_prediction_map.json",
+        "*.html", 
+        "*.css", 
+        "*.js", 
+        "icons/*",
+        "popup/*"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  
+  "options_page": "popup/options.html"
+}
+
+
+

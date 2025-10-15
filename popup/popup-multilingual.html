@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Guard + Terms AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 400px;
+            min-height: 520px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            margin: 8px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            min-height: 504px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .language-selector {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 5px 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .language-selector select {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 11px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .language-selector select option {
+            color: #333;
+            background: white;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .extension-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .extension-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .extension-card:last-child {
+            margin-bottom: 0;
+            border-left-color: #764ba2;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .card-icon {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .card-description {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        .card-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e9ecef;
+            color: #495057;
+            border: 1px solid #dee2e6;
+        }
+
+        .btn-secondary:hover {
+            background: #dee2e6;
+        }
+
+        .unified-actions {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f0f7ff 100%);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .unified-actions h3 {
+            font-size: 14px;
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .status-item {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+
+        .status-label {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .status-value {
+            font-size: 12px;
+            font-weight: 700;
+            color: #28a745;
+        }
+
+        .language-indicator {
+            background: #28a745;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            margin-left: 8px;
+        }
+
+        .analysis-result {
+            display: none;
+            background: #f0f8ff;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            border-left: 4px solid #28a745;
+        }
+
+        .analysis-result.show {
+            display: block;
+        }
+
+        .risk-indicator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .risk-badge {
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-right: 10px;
+        }
+
+        .risk-low { background: #d4edda; color: #155724; }
+        .risk-medium { background: #fff3cd; color: #856404; }
+        .risk-high { background: #f8d7da; color: #721c24; }
+
+        .summary-text {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 10px;
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            display: none;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 12px;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="language-selector">
+                <select id="languageSelect">
+                    <option value="en">🇺🇸 English</option>
+                    <option value="hi">🇮🇳 हिंदी</option>
+                    <option value="mr">🇮🇳 मराठी</option>
+                    <option value="bn">🇧🇩 বাংলা</option>
+                    <option value="ta">🇮🇳 தமிழ்</option>
+                    <option value="te">🇮🇳 తెలుగు</option>
+                    <option value="gu">🇮🇳 ગુજરાતી</option>
+                    <option value="kn">🇮🇳 ಕನ್ನಡ</option>
+                    <option value="ml">🇮🇳 മലയാളം</option>
+                    <option value="pa">🇮🇳 ਪੰਜਾਬੀ</option>
+                    <option value="ur">🇵🇰 اردو</option>
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="fr">🇫🇷 Français</option>
+                    <option value="de">🇩🇪 Deutsch</option>
+                </select>
+            </div>
+            <h1>🛡️ <span data-translate="title">Privacy Protection Suite</span></h1>
+            <p data-translate="subtitle">Cookie Guard + Terms AI Extension</p>
+            <span class="language-indicator" id="currentLang">EN</span>
+        </div>
+
+        <div class="content">
+            <!-- Cookie Guard Extension -->
+            <div class="extension-card" id="cookie-guard-card">
+                <div class="card-header">
+                    <div class="card-icon">🍪</div>
+                    <div class="card-title" data-translate="cookie_guard_title">Cookie Guard</div>
+                </div>
+                <div class="card-description" data-translate="cookie_guard_desc">
+                    Analyze and manage cookies on this page with AI-powered classification and privacy protection.
+                </div>
+                <div class="card-buttons">
+                    <button class="btn btn-primary" id="open-cookie-guard" data-translate="open_cookie_guard">Open Cookie Guard</button>
+                    <button class="btn btn-secondary" id="scan-cookies" data-translate="quick_scan">Quick Scan</button>
+                </div>
+            </div>
+
+            <!-- Terms AI Extension -->
+            <div class="extension-card" id="terms-ai-card">
+                <div class="card-header">
+                    <div class="card-icon">📋</div>
+                    <div class="card-title" data-translate="terms_ai_title">Terms AI</div>
+                </div>
+                <div class="card-description" data-translate="terms_ai_desc">
+                    AI-powered analysis of Terms & Conditions with smart summarization and risk assessment.
+                </div>
+                <div class="card-buttons">
+                    <button class="btn btn-primary" id="open-terms-ai" data-translate="open_terms_ai">Open Terms AI</button>
+                    <button class="btn btn-secondary" id="analyze-terms" data-translate="quick_analysis">Quick Analysis</button>
+                </div>
+            </div>
+
+            <!-- Unified Actions -->
+            <div class="unified-actions">
+                <h3>🚀 <span data-translate="combined_actions">Combined Actions</span></h3>
+                <div class="card-buttons">
+                    <button class="btn btn-primary" id="full-analysis" data-translate="full_privacy_analysis">Full Privacy Analysis</button>
+                </div>
+                
+                <div class="status-grid">
+                    <div class="status-item">
+                        <div class="status-label" data-translate="cookies">Cookies</div>
+                        <div class="status-value" id="cookie-count">0</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label" data-translate="terms_status_label">Terms Status</div>
+                        <div class="status-value" id="terms-status" data-translate="ready">Ready</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Results -->
+            <div class="analysis-result" id="analysisResult">
+                <div class="risk-indicator">
+                    <div class="risk-badge" id="riskBadge">LOW</div>
+                    <span data-translate="risk_level">Risk Level</span>
+                </div>
+                <div class="summary-text" id="summaryText">
+                    Analysis results will appear here...
+                </div>
+                <div class="card-buttons">
+                    <button class="btn btn-secondary" id="view-details" data-translate="view_details">View Details</button>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p data-translate="processing">Processing...</p>
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-message" id="errorMessage">
+                <span data-translate="error_occurred">An error occurred while processing your request.</span>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span data-translate="footer_text">Cookie Guard + Terms AI • Privacy Protection Suite</span>
+        </div>
+    </div>
+
+    <script src="popup-multilingual.js"></script>
+</body>
+</html>
