@@ -1,14 +1,510 @@
 {
-  "_ga": "Analytics",
-  "_gid": "Analytics",
-  "_fbp": "Marketing",
-  "sessionid": "Session",
-  "authToken": "Authentication",
-  "csrftoken": "Security",
-  "ads_user": "Marketing",
-  "session-id": "Session Management",
-  "session-id-time": "Session Timing",
-  "session-token": "Authentication",
-  "csm-hit": "Performance Monitoring",
-  "rxc": "Tracking"
+  "_ga": {
+    "category": "Analytics",
+    "purpose": "Google Analytics tracking cookie used to distinguish users and sessions",
+    "risk": "Medium",
+    "essential": false,
+    "description": "Stores a unique client identifier and tracks user interactions across the website",
+    "data_collected": [
+      "User ID",
+      "Session data",
+      "Page views",
+      "User behavior"
+    ],
+    "retention": "2 years",
+    "third_party": true
+  },
+  "_gid": {
+    "category": "Analytics",
+    "purpose": "Google Analytics cookie used to distinguish users",
+    "risk": "Medium",
+    "essential": false,
+    "description": "Stores a unique user identifier for analytics tracking",
+    "data_collected": [
+      "User ID",
+      "Session data"
+    ],
+    "retention": "24 hours",
+    "third_party": true
+  },
+  "_fbp": {
+    "category": "Marketing",
+    "purpose": "Facebook Pixel tracking cookie for advertising and analytics",
+    "risk": "High",
+    "essential": false,
+    "description": "Used by Facebook to track users across websites for advertising purposes",
+    "data_collected": [
+      "User behavior",
+      "Ad interactions",
+      "Conversion data"
+    ],
+    "retention": "90 days",
+    "third_party": true
+  },
+  "sessionid": {
+    "category": "Session",
+    "purpose": "Maintains user session state across page requests",
+    "risk": "Low",
+    "essential": true,
+    "description": "Essential for website functionality, maintains user login state and preferences",
+    "data_collected": [
+      "Session ID",
+      "User preferences"
+    ],
+    "retention": "Session",
+    "third_party": false
+  },
+  "authToken": {
+    "category": "Authentication",
+    "purpose": "Stores user authentication token for secure access",
+    "risk": "Low",
+    "essential": true,
+    "description": "Essential for user authentication and secure access to account features",
+    "data_collected": [
+      "Authentication token",
+      "User ID"
+    ],
+    "retention": "30 days",
+    "third_party": false
+  },
+  "csrftoken": {
+    "category": "Security",
+    "purpose": "Cross-Site Request Forgery protection token",
+    "risk": "Low",
+    "essential": true,
+    "description": "Security token that prevents malicious cross-site requests",
+    "data_collected": [
+      "CSRF token"
+    ],
+    "retention": "Session",
+    "third_party": false
+  },
+  "ads_user": {
+    "category": "Marketing",
+    "purpose": "User identification for targeted advertising",
+    "risk": "High",
+    "essential": false,
+    "description": "Used to identify users for personalized advertising campaigns",
+    "data_collected": [
+      "User ID",
+      "Ad preferences",
+      "Behavioral data"
+    ],
+    "retention": "1 year",
+    "third_party": true
+  },
+  "session-id": {
+    "category": "Session Management",
+    "purpose": "Unique session identifier for user tracking",
+    "risk": "Low",
+    "essential": true,
+    "description": "Essential for maintaining user session and website functionality",
+    "data_collected": [
+      "Session ID"
+    ],
+    "retention": "Session",
+    "third_party": false
+  },
+  "session-id-time": {
+    "category": "Session Timing",
+    "purpose": "Tracks session duration and timing information",
+    "risk": "Low",
+    "essential": false,
+    "description": "Records when the session was created for analytics purposes",
+    "data_collected": [
+      "Session timestamp"
+    ],
+    "retention": "Session",
+    "third_party": false
+  },
+  "session-token": {
+    "category": "Authentication",
+    "purpose": "Secure session authentication token",
+    "risk": "Low",
+    "essential": true,
+    "description": "Secure token for user authentication and session management",
+    "data_collected": [
+      "Authentication token"
+    ],
+    "retention": "7 days",
+    "third_party": false
+  },
+  "csm-hit": {
+    "category": "Performance Monitoring",
+    "purpose": "Content Security Manager hit tracking",
+    "risk": "Low",
+    "essential": false,
+    "description": "Tracks content delivery and performance metrics",
+    "data_collected": [
+      "Performance data",
+      "Content delivery metrics"
+    ],
+    "retention": "30 days",
+    "third_party": true
+  },
+  "rxc": {
+    "category": "Tracking",
+    "purpose": "Real-time user tracking and analytics",
+    "risk": "High",
+    "essential": false,
+    "description": "Advanced tracking cookie for real-time user behavior analysis",
+    "data_collected": [
+      "User behavior",
+      "Real-time interactions",
+      "Device information"
+    ],
+    "retention": "6 months",
+    "third_party": true
+  },
+  "_gat": {
+    "category": "Analytics",
+    "purpose": "Google Analytics throttling cookie",
+    "risk": "Low",
+    "essential": false,
+    "description": "Used to throttle request rate to Google Analytics",
+    "data_collected": [
+      "Request rate data"
+    ],
+    "retention": "1 minute",
+    "third_party": true
+  },
+  "_gcl_au": {
+    "category": "Marketing",
+    "purpose": "Google Ads conversion tracking",
+    "risk": "Medium",
+    "essential": false,
+    "description": "Used by Google Ads to store conversion tracking information",
+    "data_collected": [
+      "Conversion data",
+      "Ad interactions"
+    ],
+    "retention": "90 days",
+    "third_party": true
+  },
+  "PHPSESSID": {
+    "category": "Session",
+    "purpose": "PHP session identifier",
+    "risk": "Low",
+    "essential": true,
+    "description": "Essential PHP session cookie for website functionality",
+    "data_collected": [
+      "Session ID"
+    ],
+    "retention": "Session",
+    "third_party": false
+  },
+  "remember_token": {
+    "category": "Authentication",
+    "purpose": "Remember user login across browser sessions",
+    "risk": "Medium",
+    "essential": false,
+    "description": "Allows users to stay logged in across browser sessions",
+    "data_collected": [
+      "Authentication token"
+    ],
+    "retention": "1 year",
+    "third_party": false
+  },
+  "cart_id": {
+    "category": "E-commerce",
+    "purpose": "Shopping cart session management",
+    "risk": "Low",
+    "essential": true,
+    "description": "Essential for maintaining shopping cart contents",
+    "data_collected": [
+      "Cart ID",
+      "Cart contents"
+    ],
+    "retention": "30 days",
+    "third_party": false
+  },
+  "user_preferences": {
+    "category": "Preferences",
+    "purpose": "Stores user interface preferences and settings",
+    "risk": "Low",
+    "essential": false,
+    "description": "Remembers user interface preferences like theme, language, etc.",
+    "data_collected": [
+      "UI preferences",
+      "Language settings"
+    ],
+    "retention": "1 year",
+    "third_party": false
+  },
+  "tracking_pixel": {
+    "category": "Tracking",
+    "purpose": "Pixel tracking for analytics and advertising",
+    "risk": "High",
+    "essential": false,
+    "description": "Invisible tracking pixel for user behavior monitoring",
+    "data_collected": [
+      "Page views",
+      "User interactions",
+      "Device info"
+    ],
+    "retention": "2 years",
+    "third_party": true
+  },
+  "affiliate_id": {
+    "category": "Marketing",
+    "purpose": "Affiliate marketing tracking",
+    "risk": "Medium",
+    "essential": false,
+    "description": "Tracks affiliate referrals and commission attribution",
+    "data_collected": [
+      "Referral source",
+      "Commission data"
+    ],
+    "retention": "90 days",
+    "third_party": true
+  },
+  "ab_test": {
+    "category": "Analytics",
+    "purpose": "A/B testing experiment tracking",
+    "risk": "Low",
+    "essential": false,
+    "description": "Tracks which version of the site the user sees for testing",
+    "data_collected": [
+      "Test variant",
+      "User behavior"
+    ],
+    "retention": "30 days",
+    "third_party": false
+  },
+  "_hjSessionUser_": {
+    "category": "Analytics",
+    "purpose": "Hotjar user identifier for behavior analytics",
+    "risk": "Medium",
+    "essential": false,
+    "description": "Assigns a unique ID to a visitor to help Hotjar understand user behavior across sessions",
+    "data_collected": [
+      "User ID",
+      "Session behavior",
+      "Device info"
+    ],
+    "retention": "1 year",
+    "third_party": true
+  },
+  "_hjIncludedInSessionSample": {
+    "category": "Analytics",
+    "purpose": "Hotjar session sampling indicator",
+    "risk": "Low",
+    "essential": false,
+    "description": "Indicates if a user is included in data sampling for session analytics",
+    "data_collected": [
+      "Session inclusion flag"
+    ],
+    "retention": "30 minutes",
+    "third_party": true
+  },
+  "li_gc": {
+    "category": "Marketing",
+    "purpose": "LinkedIn consent cookie for ad tracking",
+    "risk": "Medium",
+    "essential": false,
+    "description": "Stores user consent for LinkedIn cookies used in advertising",
+    "data_collected": [
+      "Consent status",
+      "Ad tracking preferences"
+    ],
+    "retention": "6 months",
+    "third_party": true
+  },
+  "bcookie": {
+    "category": "Marketing",
+    "purpose": "LinkedIn browser identifier cookie",
+    "risk": "High",
+    "essential": false,
+    "description": "Used by LinkedIn to identify browsers for tracking and analytics purposes",
+    "data_collected": [
+      "Browser ID",
+      "Ad tracking data"
+    ],
+    "retention": "2 years",
+    "third_party": true
+  },
+  "lang": {
+    "category": "Preferences",
+    "purpose": "Stores user's language selection",
+    "risk": "Low",
+    "essential": false,
+    "description": "Used to remember language preferences on multilingual websites",
+    "data_collected": [
+      "Language preference"
+    ],
+    "retention": "1 year",
+    "third_party": false
+  },
+  "__cf_bm": {
+    "category": "Security",
+    "purpose": "Cloudflare bot management cookie",
+    "risk": "Low",
+    "essential": true,
+    "description": "Used to distinguish between humans and bots to maintain website security",
+    "data_collected": [
+      "Behavioral patterns",
+      "Browser signature"
+    ],
+    "retention": "30 minutes",
+    "third_party": true
+  },
+  "__hstc": {
+    "category": "Analytics",
+    "purpose": "HubSpot tracking cookie",
+    "risk": "Medium",
+    "essential": false,
+    "description": "Tracks visitors to help analyze website performance and conversions",
+    "data_collected": [
+      "Visitor ID",
+      "Session count",
+      "Timestamp"
+    ],
+    "retention": "6 months",
+    "third_party": true
+  },
+  "hubspotutk": {
+    "category": "Analytics",
+    "purpose": "HubSpot user tracking cookie",
+    "risk": "Medium",
+    "essential": false,
+    "description": "Keeps track of a visitor’s identity for analytics and form submissions",
+    "data_collected": [
+      "User ID",
+      "Contact form submissions"
+    ],
+    "retention": "6 months",
+    "third_party": true
+  },
+  "YSC": {
+    "category": "Marketing",
+    "purpose": "YouTube session tracking cookie",
+    "risk": "High",
+    "essential": false,
+    "description": "Tracks user interactions with embedded YouTube videos",
+    "data_collected": [
+      "Video views",
+      "User interactions"
+    ],
+    "retention": "Session",
+    "third_party": true
+  },
+  "VISITOR_INFO1_LIVE": {
+    "category": "Marketing",
+    "purpose": "YouTube bandwidth and behavior tracking cookie",
+    "risk": "High",
+    "essential": false,
+    "description": "Measures bandwidth and stores user preferences for embedded YouTube videos",
+    "data_collected": [
+      "Device info",
+      "Playback preferences"
+    ],
+    "retention": "6 months",
+    "third_party": true
+  },
+  "personalization_id": {
+    "category": "Marketing",
+    "purpose": "Twitter tracking and personalization cookie",
+    "risk": "High",
+    "essential": false,
+    "description": "Used by Twitter to collect data on user behavior and preferences for personalized content",
+    "data_collected": [
+      "User ID",
+      "Ad engagement",
+      "Behavioral data"
+    ],
+    "retention": "2 years",
+    "third_party": true
+  },
+  "_uetsid": {
+    "category": "Marketing",
+    "purpose": "Microsoft Bing Ads session tracking",
+    "risk": "Medium",
+    "essential": false,
+    "description": "Tracks user behavior across websites for Bing Ads performance analysis",
+    "data_collected": [
+      "Session ID",
+      "Ad interactions",
+      "Conversion data"
+    ],
+    "retention": "1 day",
+    "third_party": true
+  },
+  "_uetvid": {
+    "category": "Marketing",
+    "purpose": "Microsoft Bing Ads visitor tracking",
+    "risk": "Medium",
+    "essential": false,
+    "description": "Used to track visitors over multiple sessions for ad targeting and performance optimization",
+    "data_collected": [
+      "Visitor ID",
+      "Ad behavior"
+    ],
+    "retention": "13 months",
+    "third_party": true
+  },
+  "cookie_consent": {
+    "category": "Consent Management",
+    "purpose": "Stores user cookie consent preferences",
+    "risk": "Low",
+    "essential": true,
+    "description": "Remembers whether a user has accepted or declined cookie usage",
+    "data_collected": [
+      "Consent status",
+      "Timestamp"
+    ],
+    "retention": "1 year",
+    "third_party": false
+  },
+  "_clck": {
+    "category": "Analytics",
+    "purpose": "Microsoft Clarity user identifier",
+    "risk": "Medium",
+    "essential": false,
+    "description": "Persists Clarity User ID and preferences across sessions",
+    "data_collected": [
+      "User ID",
+      "Session data",
+      "Behavior metrics"
+    ],
+    "retention": "1 year",
+    "third_party": true
+  },
+  "_clsk": {
+    "category": "Analytics",
+    "purpose": "Microsoft Clarity session linking cookie",
+    "risk": "Medium",
+    "essential": false,
+    "description": "Connects multiple page views by a user into a single Clarity session record",
+    "data_collected": [
+      "Session ID",
+      "Page views"
+    ],
+    "retention": "1 day",
+    "third_party": true
+  },
+  "_hjTLDTest": {
+    "category": "Analytics",
+    "purpose": "Hotjar domain testing cookie",
+    "risk": "Low",
+    "essential": false,
+    "description": "Determines the most generic cookie path to use for Hotjar",
+    "data_collected": [
+      "Domain name"
+    ],
+    "retention": "Session",
+    "third_party": true
+  },
+  "__Secure-ENID": {
+    "category": "Security",
+    "purpose": "Google security cookie",
+    "risk": "Low",
+    "essential": true,
+    "description": "Used to secure user data and authenticate requests to Google services",
+    "data_collected": [
+      "Authentication data",
+      "Security tokens"
+    ],
+    "retention": "13 months",
+    "third_party": true
+  }
 }

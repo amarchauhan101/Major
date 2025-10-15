@@ -230,7 +230,7 @@ async function loadCurrentPageStatus() {
 // Cookie Guard functions
 function openCookieGuard() {
     // Navigate to Cookie Guard specific view
-    window.location.href = 'popup.html';
+    window.location.href = 'cookie-guard.html';
 }
 
 async function scanCookies() {

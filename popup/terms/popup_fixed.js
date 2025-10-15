@@ -2,9 +2,12 @@
 // 🎨 Fixed Popup Script with CSS-based Visualizations
 // ============================================================
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Fixed Visual Popup loaded');
-    
+document.addEventListener('DOMContentLoaded', function () {
+    const backBtn = document.getElementById('backBtn-ai-analyzer');
+    backBtn.addEventListener("click", () => {
+        window.location.href = 'popup-multilingual.html';
+    })
+
     // Get DOM elements
     const analyzeBtn = document.getElementById('analyze-btn');
     const settingsBtn = document.getElementById('settings-btn');
@@ -14,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const loading = document.getElementById('loading');
     const results = document.getElementById('results');
     const errorMessage = document.getElementById('error-message');
-    
+
     // Result elements
     const riskCircle = document.getElementById('risk-circle');
     const riskPercentage = document.getElementById('risk-percentage');
@@ -43,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupAccordionSystem();
     loadSavedLanguage();
     loadRecentAnalysis();
-    
+
     // Event listeners
     analyzeBtn.addEventListener('click', analyzeCurrentPage);
     settingsBtn.addEventListener('click', openSettings);
@@ -53,11 +56,11 @@ document.addEventListener('DOMContentLoaded', function() {
         tabButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const targetTab = button.dataset.tab;
-                
+
                 // Update active tab button
                 tabButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
-                
+
                 // Update active tab content
                 tabContents.forEach(content => {
                     content.classList.remove('active');
@@ -75,14 +78,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 const accordionId = header.dataset.accordion;
                 const content = document.getElementById(`${accordionId}-accordion`);
                 const isActive = header.classList.contains('active');
-                
+
                 // Close all other accordions
                 accordionHeaders.forEach(h => {
                     h.classList.remove('active');
                     const c = document.getElementById(`${h.dataset.accordion}-accordion`);
                     if (c) c.classList.remove('expanded');
                 });
-                
+
                 // Toggle current accordion
                 if (!isActive) {
                     header.classList.add('active');
@@ -104,10 +107,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleLanguageChange() {
         currentLanguage = languageSelect.value;
         chrome.storage.local.set({ selectedLanguage: currentLanguage });
-        
+
         // Show a subtle notification
         showNotification(`Language changed to ${languageSelect.options[languageSelect.selectedIndex].text}`);
-        
+
         // Re-analyze if results are already shown
         if (results.classList.contains('show')) {
             analyzeCurrentPage();
@@ -115,7 +118,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     async function checkBackendStatus() {
-        console.log('🔗 Checking backend status...');
         backendStatus.textContent = 'Checking...';
         updateStatusItem(backendStatus, 'checking');
 
@@ -125,14 +127,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (response && response.success) {
                 backendStatus.textContent = 'Connected';
                 updateStatusItem(backendStatus, 'connected');
-                console.log('✅ Backend connected');
             } else {
                 backendStatus.textContent = 'Disconnected';
                 updateStatusItem(backendStatus, 'disconnected');
-                console.log('❌ Backend disconnected:', response?.error);
             }
         } catch (error) {
-            console.error('💥 Backend check failed:', error);
+            console.error('Backend check failed:', error);
             backendStatus.textContent = 'Error';
             updateStatusItem(backendStatus, 'disconnected');
         }
@@ -151,9 +151,8 @@ document.addEventListener('DOMContentLoaded', function() {
     async function analyzeCurrentPage() {
         if (isAnalyzing) return;
 
-        console.log('🔍 Starting analysis...');
         isAnalyzing = true;
-        
+
         // Update UI
         analyzeBtn.disabled = true;
         analyzeBtn.innerHTML = '⏳ Analyzing...';
@@ -167,18 +166,16 @@ document.addEventListener('DOMContentLoaded', function() {
             // Get current tab - check if we have stored tab info first (for unified extension)
             let tab;
             const storedTabInfo = await getStoredTabInfo();
-            
+
             if (storedTabInfo && storedTabInfo.url && !storedTabInfo.url.startsWith('chrome://') && !storedTabInfo.url.startsWith('chrome-extension://')) {
                 // Use stored tab info from unified extension
                 tab = storedTabInfo;
-                console.log('🔗 Using stored tab info from unified extension:', tab.url);
             } else {
                 // Fallback to getting active tab (for standalone usage)
                 const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
                 tab = activeTab;
-                console.log('🔗 Using active tab:', tab?.url);
             }
-            
+
             if (!tab || !tab.url || tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://')) {
                 throw new Error('Cannot analyze this type of page. Please navigate to a website with Terms & Conditions.');
             }
@@ -190,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     files: ['content.js']
                 });
             } catch (injectionError) {
-                console.log('Content script handling:', injectionError);
+                console.error('Content script handling:', injectionError);
             }
 
             // Get page content
@@ -200,7 +197,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error('No Terms & Conditions content found on this page. Please navigate to a page with T&C content.');
             }
 
-            console.log('📄 Content extracted, sending for analysis...');
 
             // Send for analysis with language support
             const analysisResponse = await sendMessage({
@@ -214,15 +210,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error(analysisResponse?.error || 'Analysis failed. Please check if the backend server is running.');
             }
 
-            console.log('✅ Analysis completed successfully');
             displayResults(analysisResponse.data);
             showNotification('✅ Analysis completed successfully!', 'success');
 
         } catch (error) {
-            console.error('💥 Analysis error:', error);
-            
+            console.error('Analysis error:', error);
+
             // Show fallback analysis for demonstration
-            console.log('🔄 Showing fallback analysis for demonstration...');
             const fallbackData = {
                 summary: {
                     executive_summary: "This is a sample Terms & Conditions analysis. The document contains standard clauses for data collection, user obligations, and service usage terms.",
@@ -273,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             };
-            
+
             displayResults(fallbackData);
             showError(`Analysis failed, showing demo data. Error: ${error.message}`);
         } finally {
@@ -286,7 +280,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function displayResults(data) {
-        console.log('📊 Displaying comprehensive results:', data);
 
         // Show results container
         results.classList.add('show');
@@ -305,9 +298,8 @@ document.addEventListener('DOMContentLoaded', function() {
             displayImportantClauses(data.summary.important_clauses || []);
             displayCategoriesVisual(data.summary.categories || {});
             displayMetadata(data.summary);
-            
+
             // Generate dynamic enhanced analysis from real API data
-            console.log('🔍 Generating dynamic analysis from API data');
             const dynamicAnalysis = generateDynamicAnalysis(data);
             displayComprehensiveAnalysis(dynamicAnalysis);
         }
@@ -319,26 +311,26 @@ document.addEventListener('DOMContentLoaded', function() {
     function displayRiskAssessment(riskData) {
         const riskLevel = riskData.risk_level || 'UNKNOWN';
         const riskScore = Math.round(riskData.overall_risk || 0);
-        
+
         // Update risk percentage
         riskPercentage.textContent = `${riskScore}%`;
-        
+
         // Update risk badge
         riskBadge.textContent = riskLevel;
         riskBadge.className = `risk-badge risk-${riskLevel.toLowerCase().replace(' ', '-')}`;
-        
+
         // Update risk circle visual
         updateRiskCircle(riskScore, riskLevel);
-        
+
         // Update risk description with more detailed information
         const riskDescription = generateDetailedRiskDescription(riskData, riskLevel, riskScore);
         document.querySelector('.risk-description').textContent = riskDescription;
-        
+
         // Display organized risk factors if available
         if (riskData.risk_factors && riskData.risk_factors.length > 0) {
             displayOrganizedRiskFactors(riskData.risk_factors);
         }
-        
+
         // Display label scores if available
         if (riskData.label_scores) {
             displayLabelScores(riskData.label_scores);
@@ -353,7 +345,7 @@ document.addEventListener('DOMContentLoaded', function() {
             'HIGH': `Score: ${score}%. Contains several concerning clauses that may significantly impact your rights. Careful review strongly advised.`,
             'VERY HIGH': `Score: ${score}%. Multiple high-risk clauses detected. Consider seeking legal advice before accepting these terms.`
         };
-        
+
         return descriptions[level] || `Score: ${score}%. Risk assessment completed. Please review the analysis details.`;
     }
 
@@ -361,15 +353,15 @@ document.addEventListener('DOMContentLoaded', function() {
     function displayOrganizedRiskFactors(riskFactors) {
         const riskFactorsContainer = document.getElementById('risk-factors-container') || createRiskFactorsContainer();
         riskFactorsContainer.innerHTML = '';
-        
+
         // Clean and categorize risk factors
         const organizedFactors = organizeRiskFactors(riskFactors);
-        
+
         if (organizedFactors.length === 0) {
             riskFactorsContainer.innerHTML = '<div class="no-data">No specific risk factors identified</div>';
             return;
         }
-        
+
         organizedFactors.forEach((factor, index) => {
             const factorElement = document.createElement('div');
             factorElement.className = 'risk-factor-item';
@@ -390,48 +382,48 @@ document.addEventListener('DOMContentLoaded', function() {
         const container = document.createElement('div');
         container.id = 'risk-factors-container';
         container.className = 'risk-factors-section';
-        
+
         // Insert after risk assessment section
         const riskSection = document.querySelector('.risk-assessment');
         if (riskSection) {
             riskSection.appendChild(container);
         }
-        
+
         return container;
     }
 
     // Organize raw risk factors into readable, categorized format
     function organizeRiskFactors(rawFactors) {
         const organizedFactors = [];
-        
+
         rawFactors.forEach(factor => {
             // Skip HTML/CSS content and meaningless text
             if (isHtmlCssCode(factor) || isNotMeaningful(factor)) {
                 return;
             }
-            
+
             // Clean the factor text
             const cleanedFactor = cleanTextContent(factor);
-            
+
             if (cleanedFactor.length < 10) {
                 return;
             }
-            
+
             // Categorize and format the factor
             const categorizedFactor = categorizeRiskFactor(cleanedFactor);
-            
+
             if (categorizedFactor && !organizedFactors.some(f => f.title === categorizedFactor.title)) {
                 organizedFactors.push(categorizedFactor);
             }
         });
-        
+
         return organizedFactors.slice(0, 8); // Limit to top 8 factors
     }
 
     // Categorize risk factors by type and content
     function categorizeRiskFactor(factorText) {
         const lowerText = factorText.toLowerCase();
-        
+
         // Data Privacy Factors
         if (lowerText.includes('data') && (lowerText.includes('share') || lowerText.includes('collect'))) {
             return {
@@ -441,7 +433,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 level: lowerText.includes('third party') ? 'high' : 'medium'
             };
         }
-        
+
         // Financial Factors
         if (lowerText.includes('payment') || lowerText.includes('billing') || lowerText.includes('fee') || lowerText.includes('charge')) {
             return {
@@ -451,7 +443,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 level: lowerText.includes('automatic') || lowerText.includes('hidden') ? 'high' : 'medium'
             };
         }
-        
+
         // Legal/Arbitration Factors
         if (lowerText.includes('arbitration') || lowerText.includes('court') || lowerText.includes('legal')) {
             return {
@@ -461,7 +453,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 level: lowerText.includes('binding') ? 'high' : 'medium'
             };
         }
-        
+
         // Account Control Factors
         if (lowerText.includes('terminate') || lowerText.includes('suspend') || lowerText.includes('cancel')) {
             return {
@@ -471,7 +463,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 level: lowerText.includes('any time') || lowerText.includes('without notice') ? 'high' : 'medium'
             };
         }
-        
+
         // Liability Factors
         if (lowerText.includes('liability') || lowerText.includes('responsible') || lowerText.includes('damage')) {
             return {
@@ -481,7 +473,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 level: lowerText.includes('not responsible') || lowerText.includes('exclude') ? 'high' : 'medium'
             };
         }
-        
+
         // User Obligations
         if (lowerText.includes('user') && (lowerText.includes('must') || lowerText.includes('shall') || lowerText.includes('agree'))) {
             return {
@@ -491,7 +483,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 level: 'medium'
             };
         }
-        
+
         // Default category for other important factors
         return {
             icon: '⚠️',
@@ -505,19 +497,19 @@ document.addEventListener('DOMContentLoaded', function() {
     function displayLabelScores(labelScores) {
         const scoresContainer = document.getElementById('label-scores-container') || createLabelScoresContainer();
         scoresContainer.innerHTML = '';
-        
+
         // Sort scores by value (highest first)
         const sortedScores = Object.entries(labelScores)
-            .sort(([,a], [,b]) => b - a)
+            .sort(([, a], [, b]) => b - a)
             .slice(0, 6); // Show top 6 scores
-        
+
         sortedScores.forEach(([label, score]) => {
             const scoreValue = Math.round(score * 100);
             const scoreElement = document.createElement('div');
             scoreElement.className = 'label-score-item';
-            
+
             const riskLevel = scoreValue >= 70 ? 'high' : scoreValue >= 40 ? 'medium' : 'low';
-            
+
             scoreElement.innerHTML = `
                 <div class="label-score-bar">
                     <div class="label-score-fill risk-${riskLevel}" style="width: ${scoreValue}%"></div>
@@ -527,7 +519,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <span class="label-score-value">${scoreValue}%</span>
                 </div>
             `;
-            
+
             scoresContainer.appendChild(scoreElement);
         });
     }
@@ -537,13 +529,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const container = document.createElement('div');
         container.id = 'label-scores-container';
         container.className = 'label-scores-section';
-        
+
         // Insert after risk factors
         const riskFactorsContainer = document.getElementById('risk-factors-container');
         if (riskFactorsContainer) {
             riskFactorsContainer.parentNode.insertBefore(container, riskFactorsContainer.nextSibling);
         }
-        
+
         return container;
     }
 
@@ -565,13 +557,13 @@ document.addEventListener('DOMContentLoaded', function() {
             'MEDIUM': '#f59e0b',
             'HIGH': '#ef4444'
         };
-        
+
         const color = colors[level] || '#6b7280';
         const degrees = (percentage / 100) * 360;
-        
+
         // Update circle with conic gradient
         riskCircle.style.background = `conic-gradient(from 0deg, ${color} 0deg ${degrees}deg, #e9ecef ${degrees}deg 360deg)`;
-        
+
         // Add completion animation
         riskCircle.style.animation = 'riskCircleAnimation 2s ease-in-out';
     }
@@ -582,7 +574,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function displayKeyPoints(keyPoints) {
         keyPointsList.innerHTML = '';
-        
+
         if (!keyPoints || keyPoints.length === 0) {
             keyPointsList.innerHTML = '<div class="no-data">No key points identified in the analysis</div>';
             return;
@@ -590,7 +582,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Clean and process key points to ensure readability
         const cleanedKeyPoints = cleanAndExtractMeaningfulKeyPoints(keyPoints);
-        
+
         if (cleanedKeyPoints.length === 0) {
             keyPointsList.innerHTML = '<div class="no-data">Key points are being processed...</div>';
             return;
@@ -610,34 +602,34 @@ document.addEventListener('DOMContentLoaded', function() {
     // Clean and extract meaningful key points from potentially messy content
     function cleanAndExtractMeaningfulKeyPoints(rawKeyPoints) {
         const meaningfulPoints = [];
-        
+
         rawKeyPoints.forEach(point => {
             // Skip if point is just HTML/CSS or contains too much code
             if (isHtmlCssCode(point)) {
                 return;
             }
-            
+
             // Clean the point and extract meaningful content
             const cleanedPoint = cleanTextContent(point);
-            
+
             // Skip if too short or meaningless after cleaning
             if (cleanedPoint.length < 20 || isNotMeaningful(cleanedPoint)) {
                 return;
             }
-            
+
             // Convert to user-friendly format
             const userFriendlyPoint = convertToUserFriendlyPoint(cleanedPoint);
-            
+
             if (userFriendlyPoint && !meaningfulPoints.includes(userFriendlyPoint)) {
                 meaningfulPoints.push(userFriendlyPoint);
             }
         });
-        
+
         // If no meaningful points found, generate from content analysis
         if (meaningfulPoints.length === 0) {
             return generateFallbackKeyPoints();
         }
-        
+
         return meaningfulPoints.slice(0, 6); // Limit to top 6 points
     }
 
@@ -651,8 +643,8 @@ document.addEventListener('DOMContentLoaded', function() {
             'class=', 'id=', '<div', '</div>', '<span', '</span>',
             'Download', 'Nitro', 'Discover', 'Safety', 'Resources'
         ];
-        
-        return htmlCssIndicators.some(indicator => 
+
+        return htmlCssIndicators.some(indicator =>
             text.toLowerCase().includes(indicator.toLowerCase())
         );
     }
@@ -681,9 +673,9 @@ document.addEventListener('DOMContentLoaded', function() {
             /^[{}();,.\s]+$/, // Just punctuation
             /^nav\s|styles$/i, // Navigation/style references
         ];
-        
+
         return meaninglessPatterns.some(pattern => pattern.test(text)) ||
-               text.split(' ').length < 4; // Too short to be meaningful
+            text.split(' ').length < 4; // Too short to be meaningful
     }
 
     // Convert technical content to user-friendly language
@@ -700,21 +692,21 @@ document.addEventListener('DOMContentLoaded', function() {
             'processing': 'using or handling',
             'consent': 'permission'
         };
-        
+
         let friendlyText = text;
-        
+
         // Apply conversions
         Object.entries(conversions).forEach(([technical, friendly]) => {
             const regex = new RegExp(`\\b${technical}\\b`, 'gi');
             friendlyText = friendlyText.replace(regex, friendly);
         });
-        
+
         // Ensure proper sentence structure
         friendlyText = friendlyText.charAt(0).toUpperCase() + friendlyText.slice(1);
         if (!/[.!?]$/.test(friendlyText)) {
             friendlyText += '.';
         }
-        
+
         return friendlyText;
     }
 
@@ -723,7 +715,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return [
             "Review this document carefully before accepting the terms",
             "Key privacy and data handling policies are outlined",
-            "User rights and responsibilities are specified", 
+            "User rights and responsibilities are specified",
             "Service limitations and company policies are detailed",
             "Contact information for questions is provided"
         ];
@@ -731,7 +723,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function displayImportantClauses(clauses) {
         importantClauses.innerHTML = '';
-        
+
         if (!clauses || clauses.length === 0) {
             importantClauses.innerHTML = '<div class="no-data">No concerning clauses identified</div>';
             return;
@@ -739,7 +731,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Clean and organize clauses for better readability
         const processedClauses = processImportantClauses(clauses);
-        
+
         if (processedClauses.length === 0) {
             importantClauses.innerHTML = '<div class="no-data">Important clauses are being processed...</div>';
             return;
@@ -748,11 +740,11 @@ document.addEventListener('DOMContentLoaded', function() {
         processedClauses.forEach(clause => {
             const clauseElement = document.createElement('div');
             clauseElement.className = 'clause-item';
-            
+
             // Get appropriate icon for clause type
             const typeIcon = getClauseTypeIcon(clause.type);
             const riskColor = getRiskColor(clause.concern_level);
-            
+
             clauseElement.innerHTML = `
                 <div class="clause-header">
                     <div class="clause-type">
@@ -781,21 +773,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // Process and clean important clauses for better readability
     function processImportantClauses(rawClauses) {
         const processedClauses = [];
-        
+
         rawClauses.forEach(clause => {
             // Skip if clause is HTML/CSS or too messy
             if (isHtmlCssCode(clause.clause || '')) {
                 return;
             }
-            
+
             // Clean the clause text
             const cleanedClause = cleanClauseText(clause.clause || '');
-            
+
             // Skip if too short or meaningless after cleaning
             if (cleanedClause.length < 30) {
                 return;
             }
-            
+
             // Create processed clause with additional context
             const processedClause = {
                 type: clause.type || 'Important Clause',
@@ -805,10 +797,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 user_impact: generateUserImpact(clause.type, clause.concern_level),
                 recommendation: generateRecommendation(clause.type, clause.concern_level)
             };
-            
+
             processedClauses.push(processedClause);
         });
-        
+
         return processedClauses;
     }
 
@@ -914,7 +906,7 @@ document.addEventListener('DOMContentLoaded', function() {
             'Payment Terms': '💳',
             'User Obligations': '📋'
         };
-        
+
         return icons[clauseType] || '📄';
     }
 
@@ -925,13 +917,13 @@ document.addEventListener('DOMContentLoaded', function() {
             'medium': '#f59e0b',
             'low': '#22c55e'
         };
-        
+
         return colors[riskLevel] || '#6b7280';
     }
 
     function displayCategoriesVisual(categories) {
         categoriesVisual.innerHTML = '';
-        
+
         if (!categories || Object.keys(categories).length === 0) {
             categoriesVisual.innerHTML = '<div class="no-data">No content categories analyzed</div>';
             return;
@@ -949,10 +941,10 @@ document.addEventListener('DOMContentLoaded', function() {
         Object.entries(categories).forEach(([key, value], index) => {
             const categoryElement = document.createElement('div');
             categoryElement.className = 'category-item';
-            
+
             const label = categoryLabels[key] || key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
             const percentage = Math.round(value || 0);
-            
+
             categoryElement.innerHTML = `
                 <div class="category-label">${label}</div>
                 <div class="category-bar">
@@ -960,9 +952,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="category-percentage">${percentage}%</div>
             `;
-            
+
             categoriesVisual.appendChild(categoryElement);
-            
+
             // Animate bar fill
             setTimeout(() => {
                 const fill = categoryElement.querySelector('.category-fill');
@@ -982,7 +974,7 @@ document.addEventListener('DOMContentLoaded', function() {
         errorMessage.classList.add('show');
         analysisStatus.textContent = 'Error';
         updateStatusItem(analysisStatus, 'disconnected');
-        
+
         // Auto-hide error after 8 seconds
         setTimeout(() => {
             errorMessage.classList.remove('show');
@@ -1006,9 +998,9 @@ document.addEventListener('DOMContentLoaded', function() {
             animation: slideInRight 0.3s ease;
         `;
         notification.textContent = message;
-        
+
         document.body.appendChild(notification);
-        
+
         // Auto-remove after 3 seconds
         setTimeout(() => {
             notification.style.animation = 'slideOutRight 0.3s ease';
@@ -1028,12 +1020,12 @@ document.addEventListener('DOMContentLoaded', function() {
             'Auto-detect T&C': 'Enabled',
             'Notifications': 'Enabled'
         };
-        
+
         let settingsText = 'Current Settings:\n\n';
         Object.entries(settings).forEach(([key, value]) => {
             settingsText += `${key}: ${value}\n`;
         });
-        
+
         alert(settingsText + '\nTo change language, use the dropdown above.\nFor advanced settings, check the extension options.');
     }
 
@@ -1053,7 +1045,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const timeDiff = Date.now() - result.lastAnalysis.timestamp;
                 // Only load if analysis is less than 1 hour old
                 if (timeDiff < 3600000) {
-                    console.log('📋 Loading recent analysis');
                     displayResults(result.lastAnalysis.data);
                 }
             }
@@ -1091,42 +1082,40 @@ document.addEventListener('DOMContentLoaded', function() {
         showError('An unexpected error occurred. Please try again or check the browser console for details.');
     });
 
-    console.log('✅ Fixed popup script initialized');
 
     // Generate Dynamic Analysis from Real API Data
     function generateDynamicAnalysis(apiData) {
-        console.log('🔄 Generating dynamic analysis from API response:', apiData);
-        
+
         const summary = apiData.summary || {};
         const riskAnalysis = apiData.risk_analysis || {};
         const categories = summary.categories || {};
         const importantClauses = summary.important_clauses || [];
         const riskFactors = riskAnalysis.risk_factors || [];
-        
+
         // Generate data collection analysis based on important clauses
         const dataCollected = generateDataCollectionAnalysis(importantClauses, riskFactors);
-        
+
         // Generate data usage analysis based on risk factors and categories
         const dataUsage = generateDataUsageAnalysis(riskFactors, categories);
-        
+
         // Generate data sharing analysis
         const dataSharing = generateDataSharingAnalysis(importantClauses, riskFactors);
-        
+
         // Generate user rights analysis
         const userRights = generateUserRightsAnalysis(importantClauses, summary.key_points || []);
-        
+
         // Generate liabilities analysis
         const liabilities = generateLiabilitiesAnalysis(importantClauses, riskFactors);
-        
+
         // Generate automatic renewals analysis
         const automaticRenewals = generateAutomaticRenewalsAnalysis(importantClauses, riskFactors);
-        
+
         // Generate termination clauses analysis
         const terminationClauses = generateTerminationAnalysis(importantClauses, riskFactors);
-        
+
         // Generate risk score breakdown
         const riskScoreBreakdown = generateRiskScoreBreakdown(riskAnalysis, categories);
-        
+
         return {
             summary_key_points: {
                 main_purpose: summary.executive_summary || "Analysis of terms and conditions document focusing on privacy, user rights, and service obligations.",
@@ -1162,53 +1151,53 @@ document.addEventListener('DOMContentLoaded', function() {
         // Analyze clauses for data collection patterns
         clauses.forEach(clause => {
             const text = clause.clause?.toLowerCase() || '';
-            
+
             if (text.includes('email')) {
                 dataTypes.email.detected = true;
                 dataTypes.email.frequency++;
                 dataTypes.email.examples.push('Email communication');
             }
-            
+
             if (text.includes('location') || text.includes('gps')) {
                 dataTypes.location.detected = true;
                 dataTypes.location.frequency++;
                 dataTypes.location.examples.push('Location services');
             }
-            
+
             if (text.includes('device') || text.includes('browser') || text.includes('ip')) {
                 dataTypes.device_info.detected = true;
                 dataTypes.device_info.frequency++;
                 dataTypes.device_info.examples.push('Device information');
             }
-            
+
             if (text.includes('usage') || text.includes('activity') || text.includes('behavior')) {
                 dataTypes.usage_data.detected = true;
                 dataTypes.usage_data.frequency++;
                 dataTypes.usage_data.examples.push('Usage patterns');
             }
-            
+
             if (text.includes('cookie') || text.includes('tracking')) {
                 dataTypes.cookies.detected = true;
                 dataTypes.cookies.frequency++;
                 dataTypes.cookies.examples.push('Tracking cookies');
             }
-            
+
             if (text.includes('personal') || text.includes('profile')) {
                 dataTypes.personal_info.detected = true;
                 dataTypes.personal_info.frequency++;
                 dataTypes.personal_info.examples.push('Personal details');
             }
-            
+
             if (text.includes('payment') || text.includes('billing') || text.includes('financial')) {
                 dataTypes.financial.detected = true;
                 dataTypes.financial.frequency++;
                 dataTypes.financial.examples.push('Payment information');
             }
-            
+
             if (text.includes('opt out') || text.includes('unsubscribe')) {
                 optOutAvailable = true;
             }
-            
+
             if (text.includes('automatic') || text.includes('cookie')) {
                 collectionMethods.push('Automatic');
             }
@@ -1240,7 +1229,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Check risk factors for usage purposes
         riskFactors.forEach(factor => {
             const factorLower = factor.toLowerCase();
-            
+
             if (factorLower.includes('data sharing') || factorLower.includes('marketing')) {
                 purposes.advertising.mentioned = true;
                 purposes.advertising.frequency++;
@@ -1293,9 +1282,9 @@ document.addEventListener('DOMContentLoaded', function() {
         let anonymization = false;
 
         // Check for data sharing indicators
-        [...clauses, ...riskFactors.map(f => ({clause: f}))].forEach(item => {
+        [...clauses, ...riskFactors.map(f => ({ clause: f }))].forEach(item => {
             const text = (item.clause || '').toLowerCase();
-            
+
             if (text.includes('third party') || text.includes('third-party')) {
                 sharingEntities.third_parties.shares_with = true;
                 sharingEntities.third_parties.frequency++;
@@ -1341,9 +1330,9 @@ document.addEventListener('DOMContentLoaded', function() {
             restrict_processing: { available: false, frequency: 0, compliance_score: 0 }
         };
 
-        [...clauses, ...keyPoints.map(p => ({clause: p}))].forEach(item => {
+        [...clauses, ...keyPoints.map(p => ({ clause: p }))].forEach(item => {
             const text = (item.clause || '').toLowerCase();
-            
+
             if (text.includes('delete') || text.includes('remove') || text.includes('right to deletion')) {
                 rights.delete_data.available = true;
                 rights.delete_data.frequency++;
@@ -1394,9 +1383,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         let userProtectionLevel = "Medium";
 
-        [...clauses, ...riskFactors.map(f => ({clause: f}))].forEach(item => {
+        [...clauses, ...riskFactors.map(f => ({ clause: f }))].forEach(item => {
             const text = (item.clause || '').toLowerCase();
-            
+
             if (text.includes('not responsible') || text.includes('not liable')) {
                 liabilityClauses.not_responsible.present = true;
                 liabilityClauses.not_responsible.frequency++;
@@ -1441,9 +1430,9 @@ document.addEventListener('DOMContentLoaded', function() {
         let cancellationDifficulty = "Easy";
         let refundPolicy = { available: false, conditions: "None specified" };
 
-        [...clauses, ...riskFactors.map(f => ({clause: f}))].forEach(item => {
+        [...clauses, ...riskFactors.map(f => ({ clause: f }))].forEach(item => {
             const text = (item.clause || '').toLowerCase();
-            
+
             if (text.includes('automatic') && (text.includes('renew') || text.includes('billing'))) {
                 renewalPractices.auto_renewal.mentioned = true;
                 renewalPractices.auto_renewal.frequency++;
@@ -1490,9 +1479,9 @@ document.addEventListener('DOMContentLoaded', function() {
         let userNoticeError = "Not specified";
         let dataDeletionPolicy = { automatic_deletion: false, timeline: "Not specified" };
 
-        [...clauses, ...riskFactors.map(f => ({clause: f}))].forEach(item => {
+        [...clauses, ...riskFactors.map(f => ({ clause: f }))].forEach(item => {
             const text = (item.clause || '').toLowerCase();
-            
+
             if (text.includes('immediately') && text.includes('terminat')) {
                 terminationRights.immediate_termination.present = true;
                 terminationRights.immediate_termination.frequency++;
@@ -1531,11 +1520,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function generateRiskScoreBreakdown(riskAnalysis, categories) {
         const categoryScores = {};
-        
+
         // Convert category percentages to risk scores
         Object.entries(categories).forEach(([key, value]) => {
             let riskScore = 0;
-            
+
             // Higher category presence = higher risk for certain categories
             if (key === 'privacy_data' || key === 'cookies_tracking') {
                 riskScore = Math.min(value * 0.8, 100); // High risk categories
@@ -1544,7 +1533,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 riskScore = Math.min(value * 0.6, 100); // Medium risk categories
             }
-            
+
             categoryScores[key] = Math.round(riskScore);
         });
 
@@ -1556,10 +1545,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function determineDocumentType(categories) {
-        const maxCategory = Object.entries(categories).reduce((a, b) => 
+        const maxCategory = Object.entries(categories).reduce((a, b) =>
             categories[a] > categories[b] ? a : b, 'privacy_data'
         );
-        
+
         const typeMap = {
             privacy_data: "Privacy Policy & Terms of Service",
             payments_billing: "Service Agreement with Billing Terms",
@@ -1568,7 +1557,7 @@ document.addEventListener('DOMContentLoaded', function() {
             dispute_resolution: "Legal Agreement with Dispute Resolution",
             cookies_tracking: "Privacy Policy with Tracking Terms"
         };
-        
+
         return typeMap[maxCategory] || "Terms & Conditions Document";
     }
 
@@ -1591,7 +1580,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 main_purpose: "This service agreement outlines terms for platform usage, data handling, payment processing, and user responsibilities. Key focus areas include privacy protection, service availability, and legal compliance.",
                 key_highlights: [
                     "Personal data collection for service improvement",
-                    "Third-party integrations for enhanced functionality", 
+                    "Third-party integrations for enhanced functionality",
                     "Automatic billing and renewal processes",
                     "User content ownership and licensing terms",
                     "Dispute resolution through arbitration"
@@ -1691,7 +1680,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 risk_level: "HIGH",
                 risk_color: "#ef4444",
                 recommendations: [
-                    "Review data sharing practices carefully", 
+                    "Review data sharing practices carefully",
                     "Check cancellation and refund policies",
                     "Understand termination conditions",
                     "Consider legal implications carefully",
@@ -1703,69 +1692,68 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Comprehensive Analysis Display Functions
     function displayComprehensiveAnalysis(enhancedData) {
-        console.log('🔍 Displaying comprehensive analysis:', enhancedData);
-        
+
         if (!enhancedData) {
             console.log('⚠️ No enhanced data provided');
             return;
         }
-        
+
         // Display Summary/Key Points
         if (enhancedData.summary_key_points) {
             displayEnhancedSummary(enhancedData.summary_key_points);
         } else {
             console.log('⚠️ No summary_key_points found');
         }
-        
+
         // Display Data Collected
         if (enhancedData.data_collected) {
             displayDataCollected(enhancedData.data_collected);
         } else {
             console.log('⚠️ No data_collected found');
         }
-        
+
         // Display Data Usage
         if (enhancedData.data_usage) {
             displayDataUsage(enhancedData.data_usage);
         } else {
             console.log('⚠️ No data_usage found');
         }
-        
+
         // Display Data Sharing
         if (enhancedData.data_sharing) {
             displayDataSharing(enhancedData.data_sharing);
         } else {
             console.log('⚠️ No data_sharing found');
         }
-        
+
         // Display User Rights
         if (enhancedData.user_rights) {
             displayUserRights(enhancedData.user_rights);
         } else {
             console.log('⚠️ No user_rights found');
         }
-        
+
         // Display Liabilities
         if (enhancedData.liabilities) {
             displayLiabilities(enhancedData.liabilities);
         } else {
             console.log('⚠️ No liabilities found');
         }
-        
+
         // Display Automatic Renewals
         if (enhancedData.automatic_renewals) {
             displayAutomaticRenewals(enhancedData.automatic_renewals);
         } else {
             console.log('⚠️ No automatic_renewals found');
         }
-        
+
         // Display Termination Clauses
         if (enhancedData.termination_clauses) {
             displayTerminationClauses(enhancedData.termination_clauses);
         } else {
             console.log('⚠️ No termination_clauses found');
         }
-        
+
         // Display Risk Score Breakdown
         if (enhancedData.risk_score_breakdown) {
             displayRiskScoreBreakdown(enhancedData.risk_score_breakdown);
@@ -1777,12 +1765,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function displayEnhancedSummary(summaryData) {
         const summaryText = document.getElementById('enhanced-summary-text');
         const summaryGrid = document.getElementById('enhanced-summary-grid');
-        
+
         console.log('📄 Displaying enhanced summary:', summaryData);
-        
+
         if (summaryData && summaryText && summaryGrid) {
             summaryText.textContent = summaryData.main_purpose || 'Enhanced summary not available';
-            
+
             summaryGrid.innerHTML = `
                 <div class="summary-card">
                     <div class="summary-card-icon">📄</div>
@@ -1802,25 +1790,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function displayDataCollected(dataCollected) {
         const container = document.getElementById('data-collected-chart');
-        
-        console.log('📊 Displaying data collected:', dataCollected);
-        
+
         if (!container) {
             console.log('⚠️ Data collected container not found');
             return;
         }
-        
+
         if (!dataCollected || !dataCollected.types_collected) {
             container.innerHTML = '<div class="no-data">No data collection information available</div>';
             return;
         }
-        
+
         container.innerHTML = '';
-        
+
         Object.entries(dataCollected.types_collected).forEach(([type, info], index) => {
             const riskLevel = info.detected ? (info.frequency > 2 ? 'high' : 'medium') : 'low';
             const percentage = info.detected ? Math.min(100, info.frequency * 20) : 0;
-            
+
             const chartBar = document.createElement('div');
             chartBar.className = 'chart-bar';
             chartBar.innerHTML = `
@@ -1830,9 +1816,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="chart-value ${riskLevel}">${percentage}%</div>
             `;
-            
+
             container.appendChild(chartBar);
-            
+
             // Animate bar fill
             setTimeout(() => {
                 const fill = chartBar.querySelector('.chart-fill-inner');
@@ -1843,50 +1829,50 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function displayDataUsage(dataUsage) {
         const container = document.getElementById('data-usage-heatmap');
-        
+
         if (!dataUsage || !dataUsage.purposes) {
             container.innerHTML = '<div class="no-data">No data usage information available</div>';
             return;
         }
-        
+
         container.innerHTML = '';
-        
+
         Object.entries(dataUsage.purposes).forEach(([purpose, info]) => {
-            const riskClass = info.risk_level === 'high' ? 'heatmap-high' : 
-                            info.risk_level === 'medium' ? 'heatmap-medium' : 'heatmap-low';
-            
+            const riskClass = info.risk_level === 'high' ? 'heatmap-high' :
+                info.risk_level === 'medium' ? 'heatmap-medium' : 'heatmap-low';
+
             const cell = document.createElement('div');
             cell.className = `heatmap-cell ${riskClass}`;
             cell.innerHTML = `
                 <div>${purpose.replace(/_/g, ' ')}</div>
                 <div>${info.mentioned ? 'Used' : 'Not Used'}</div>
             `;
-            
+
             container.appendChild(cell);
         });
     }
 
     function displayDataSharing(dataSharing) {
         const container = document.getElementById('data-sharing-wordcloud');
-        
+
         if (!dataSharing || !dataSharing.sharing_entities) {
             container.innerHTML = '<div class="no-data">No data sharing information available</div>';
             return;
         }
-        
+
         container.innerHTML = '';
-        
+
         Object.entries(dataSharing.sharing_entities).forEach(([entity, info]) => {
             if (info.shares_with) {
                 const tag = document.createElement('div');
                 tag.className = `word-tag ${info.risk_level === 'high' ? 'frequent' : ''}`;
                 tag.textContent = entity.replace(/_/g, ' ');
-                tag.style.backgroundColor = info.risk_level === 'high' ? '#ef4444' : 
-                                          info.risk_level === 'medium' ? '#f59e0b' : '#22c55e';
+                tag.style.backgroundColor = info.risk_level === 'high' ? '#ef4444' :
+                    info.risk_level === 'medium' ? '#f59e0b' : '#22c55e';
                 container.appendChild(tag);
             }
         });
-        
+
         if (container.children.length === 0) {
             container.innerHTML = '<div class="no-data">No data sharing detected</div>';
         }
@@ -1894,14 +1880,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function displayUserRights(userRights) {
         const container = document.getElementById('user-rights-timeline');
-        
+
         if (!userRights || !userRights.available_rights) {
             container.innerHTML = '<div class="no-data">No user rights information available</div>';
             return;
         }
-        
+
         container.innerHTML = '';
-        
+
         Object.entries(userRights.available_rights).forEach(([right, info]) => {
             const timelineItem = document.createElement('div');
             timelineItem.className = 'timeline-item';
@@ -1912,47 +1898,47 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="timeline-description">${info.available ? 'Available' : 'Not Available'}</div>
                 </div>
             `;
-            
+
             container.appendChild(timelineItem);
         });
     }
 
     function displayLiabilities(liabilities) {
         const container = document.getElementById('liabilities-text');
-        
+
         if (!liabilities || !liabilities.liability_clauses) {
             container.innerHTML = '<div class="no-data">No liability information available</div>';
             return;
         }
-        
+
         let liabilityText = '';
-        
+
         Object.entries(liabilities.liability_clauses).forEach(([clause, info]) => {
             if (info.present) {
-                const riskClass = info.user_risk === 'high' ? 'text-danger' : 
-                                info.user_risk === 'medium' ? 'text-caution' : 'text-safe';
+                const riskClass = info.user_risk === 'high' ? 'text-danger' :
+                    info.user_risk === 'medium' ? 'text-caution' : 'text-safe';
                 liabilityText += `<span class="${riskClass}">${clause.replace(/_/g, ' ')}</span> `;
             }
         });
-        
+
         container.innerHTML = liabilityText || '<div class="no-data">No concerning liability clauses detected</div>';
     }
 
     function displayAutomaticRenewals(renewals) {
         const container = document.getElementById('renewals-chart');
-        
+
         if (!renewals || !renewals.renewal_practices) {
             container.innerHTML = '<div class="no-data">No renewal information available</div>';
             return;
         }
-        
+
         container.innerHTML = '';
-        
+
         Object.entries(renewals.renewal_practices).forEach(([practice, info], index) => {
-            const riskLevel = info.financial_risk === 'high' ? 'high' : 
-                            info.financial_risk === 'medium' ? 'medium' : 'low';
+            const riskLevel = info.financial_risk === 'high' ? 'high' :
+                info.financial_risk === 'medium' ? 'medium' : 'low';
             const percentage = info.mentioned ? (info.frequency * 25) : 0;
-            
+
             const chartBar = document.createElement('div');
             chartBar.className = 'chart-bar';
             chartBar.innerHTML = `
@@ -1962,9 +1948,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="chart-value ${riskLevel}">${percentage}%</div>
             `;
-            
+
             container.appendChild(chartBar);
-            
+
             // Animate bar fill
             setTimeout(() => {
                 const fill = chartBar.querySelector('.chart-fill-inner');
@@ -1975,19 +1961,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function displayTerminationClauses(termination) {
         const container = document.getElementById('termination-timeline');
-        
+
         if (!termination || !termination.termination_rights) {
             container.innerHTML = '<div class="no-data">No termination information available</div>';
             return;
         }
-        
+
         container.innerHTML = '';
-        
+
         Object.entries(termination.termination_rights).forEach(([clause, info]) => {
             const timelineItem = document.createElement('div');
             timelineItem.className = 'timeline-item';
-            timelineItem.style.borderLeftColor = info.control_risk === 'high' ? '#ef4444' : 
-                                                info.control_risk === 'medium' ? '#f59e0b' : '#22c55e';
+            timelineItem.style.borderLeftColor = info.control_risk === 'high' ? '#ef4444' :
+                info.control_risk === 'medium' ? '#f59e0b' : '#22c55e';
             timelineItem.innerHTML = `
                 <div class="timeline-icon">${info.present ? '⚠️' : '✓'}</div>
                 <div class="timeline-content">
@@ -1995,36 +1981,36 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="timeline-description">${info.present ? 'Present' : 'Not Present'}</div>
                 </div>
             `;
-            
+
             container.appendChild(timelineItem);
         });
     }
 
     function displayRiskScoreBreakdown(riskScore) {
         const heatmapContainer = document.getElementById('risk-breakdown-heatmap');
-        
+
         if (!riskScore || !riskScore.category_scores) {
             heatmapContainer.innerHTML = '<div class="no-data">No risk breakdown available</div>';
             return;
         }
-        
+
         // Display heatmap
         heatmapContainer.innerHTML = '';
-        
+
         Object.entries(riskScore.category_scores).forEach(([category, score]) => {
-            const riskClass = score >= 75 ? 'heatmap-high' : 
-                            score >= 50 ? 'heatmap-medium' : 'heatmap-low';
-            
+            const riskClass = score >= 75 ? 'heatmap-high' :
+                score >= 50 ? 'heatmap-medium' : 'heatmap-low';
+
             const cell = document.createElement('div');
             cell.className = `heatmap-cell ${riskClass}`;
             cell.innerHTML = `
                 <div>${category.replace(/_/g, ' ')}</div>
                 <div>${Math.round(score)}%</div>
             `;
-            
+
             heatmapContainer.appendChild(cell);
         });
-        
+
         // Create radar chart if Chart.js is available
         if (typeof Chart !== 'undefined') {
             createRadarChart(riskScore.category_scores);
@@ -2034,17 +2020,17 @@ document.addEventListener('DOMContentLoaded', function() {
     function createRadarChart(categoryScores) {
         const canvas = document.getElementById('risk-radar-chart');
         if (!canvas) return;
-        
+
         const ctx = canvas.getContext('2d');
-        
+
         // Destroy existing chart if it exists
         if (chartInstances.radarChart) {
             chartInstances.radarChart.destroy();
         }
-        
+
         const labels = Object.keys(categoryScores).map(key => key.replace(/_/g, ' '));
         const data = Object.values(categoryScores);
-        
+
         chartInstances.radarChart = new Chart(ctx, {
             type: 'radar',
             data: {
@@ -2094,12 +2080,12 @@ async function getStoredTabInfo() {
     try {
         const result = await chrome.storage.local.get(['currentTabForAnalysis']);
         const tabInfo = result.currentTabForAnalysis;
-        
+
         // Check if tab info is recent (within 5 minutes)
         if (tabInfo && tabInfo.timestamp && (Date.now() - tabInfo.timestamp) < 300000) {
             return tabInfo;
         }
-        
+
         return null;
     } catch (error) {
         console.error('Error getting stored tab info:', error);

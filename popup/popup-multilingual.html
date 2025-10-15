@@ -1,10 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cookie Guard + Terms AI</title>
+    <title>Privacy Protection Suite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* ================================
+   PROFESSIONAL THEME VARIABLES
+   ================================ */
+        :root {
+            --primary-blue: #1E90FF;
+            --primary-dark: #1565C0;
+            --white: #FFFFFF;
+            --background-gray: #F2F4F8;
+            --success-green: #00C853;
+            --danger-red: #D32F2F;
+            --warning-orange: #FF9800;
+            --text-primary: #1A1A1A;
+            --text-secondary: #616161;
+            --text-light: #9E9E9E;
+            --border-color: #E0E0E0;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --border-radius: 8px;
+            --transition: all 0.2s ease;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,208 +36,305 @@
         }
 
         body {
-            width: 400px;
-            min-height: 520px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
+            width: 450px;
+            min-height: 600px;
+            background: var(--background-gray);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text-primary);
         }
 
         .container {
-            background: white;
-            margin: 8px;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            min-height: 504px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
+        /* ================================
+   HEADER STYLES
+   ================================ */
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            text-align: center;
+            background: var(--white);
+            padding: 24px 20px;
+            box-shadow: var(--shadow-sm);
             position: relative;
-        }
-
-        .header h1 {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .header p {
-            font-size: 12px;
-            opacity: 0.9;
         }
 
         .language-selector {
             position: absolute;
-            top: 10px;
-            right: 15px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 20px;
-            padding: 5px 10px;
-            backdrop-filter: blur(10px);
+            top: 16px;
+            right: 16px;
+            background: var(--background-gray);
+            border-radius: 6px;
+            padding: 6px 10px;
+            border: 1px solid var(--border-color);
         }
 
         .language-selector select {
             background: transparent;
             border: none;
-            color: white;
-            font-size: 11px;
+            color: var(--text-primary);
+            font-size: 12px;
+            font-weight: 500;
             cursor: pointer;
             outline: none;
+            font-family: 'Inter', sans-serif;
         }
 
         .language-selector select option {
-            color: #333;
-            background: white;
+            color: var(--text-primary);
+            background: var(--white);
         }
 
-        .content {
-            padding: 20px;
+        .header-content {
+            text-align: center;
         }
 
-        .extension-card {
-            background: #f8f9fa;
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 12px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-dark) 100%);
             border-radius: 12px;
-            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-icon img {
+            width: 28px;
+            height: 28px;
+            filter: brightness(0) invert(1);
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .header p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .language-indicator {
+            display: inline-block;
+            background: var(--primary-blue);
+            color: var(--white);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-top: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        /* ================================
+   CONTENT SECTION
+   ================================ */
+        .content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* ================================
+   EXTENSION CARDS
+   ================================ */
+        .extension-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 18px;
             margin-bottom: 16px;
-            border-left: 4px solid #667eea;
-            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary-blue);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
             cursor: pointer;
         }
 
         .extension-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+            box-shadow: var(--shadow-md);
+            border-left-color: var(--primary-dark);
         }
 
-        .extension-card:last-child {
-            margin-bottom: 0;
-            border-left-color: #764ba2;
+        .extension-card:last-of-type {
+            border-left-color: #7B1FA2;
+        }
+
+        .extension-card:last-of-type:hover {
+            border-left-color: #6A1B9A;
         }
 
         .card-header {
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .card-icon {
-            font-size: 20px;
-            margin-right: 10px;
+            width: 40px;
+            height: 40px;
+            background: var(--background-gray);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .card-icon img {
+            width: 22px;
+            height: 22px;
+            filter: opacity(0.8);
         }
 
         .card-title {
             font-size: 16px;
             font-weight: 600;
-            color: #333;
+            color: var(--text-primary);
         }
 
         .card-description {
             font-size: 13px;
-            color: #666;
-            line-height: 1.4;
-            margin-bottom: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 14px;
         }
 
         .card-buttons {
             display: flex;
-            gap: 8px;
+            gap: 10px;
         }
 
         .btn {
-            padding: 8px 16px;
+            padding: 10px 16px;
             border: none;
-            border-radius: 8px;
-            font-size: 12px;
+            border-radius: var(--border-radius);
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: var(--transition);
             flex: 1;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn img {
+            width: 16px;
+            height: 16px;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: var(--primary-blue);
+            color: var(--white);
         }
 
         .btn-primary:hover {
+            background: var(--primary-dark);
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary img {
+            filter: brightness(0) invert(1);
         }
 
         .btn-secondary {
-            background: #e9ecef;
-            color: #495057;
-            border: 1px solid #dee2e6;
+            background: var(--white);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
         }
 
         .btn-secondary:hover {
-            background: #dee2e6;
+            background: var(--background-gray);
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
         }
 
+        .btn-secondary:hover img {
+            filter: opacity(0.8);
+        }
+
+        /* ================================
+   UNIFIED ACTIONS SECTION
+   ================================ */
         .unified-actions {
-            background: linear-gradient(135deg, #e3f2fd 0%, #f0f7ff 100%);
-            border-radius: 12px;
-            padding: 16px;
-            margin-top: 16px;
-            border-left: 4px solid #2196f3;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 18px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--success-green);
+            box-shadow: var(--shadow-sm);
         }
 
         .unified-actions h3 {
-            font-size: 14px;
-            color: #1976d2;
-            margin-bottom: 10px;
+            font-size: 15px;
+            color: var(--text-primary);
+            margin-bottom: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .unified-actions h3 img {
+            width: 18px;
+            height: 18px;
+            filter: opacity(0.8);
         }
 
         .status-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 16px;
+            gap: 12px;
+            margin-top: 14px;
         }
 
         .status-item {
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
+            background: var(--background-gray);
+            padding: 12px;
+            border-radius: var(--border-radius);
             text-align: center;
-            border: 1px solid #e9ecef;
+            border: 1px solid var(--border-color);
         }
 
         .status-label {
-            font-size: 10px;
-            color: #666;
+            font-size: 11px;
+            color: var(--text-secondary);
             text-transform: uppercase;
             font-weight: 600;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
         }
 
         .status-value {
-            font-size: 12px;
+            font-size: 18px;
             font-weight: 700;
-            color: #28a745;
+            color: var(--success-green);
         }
 
-        .language-indicator {
-            background: #28a745;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 10px;
-            margin-left: 8px;
-        }
-
+        /* ================================
+   ANALYSIS RESULT
+   ================================ */
         .analysis-result {
             display: none;
-            background: #f0f8ff;
-            border-radius: 12px;
-            padding: 16px;
-            margin-top: 16px;
-            border-left: 4px solid #28a745;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 18px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--success-green);
+            box-shadow: var(--shadow-sm);
         }
 
         .analysis-result.show {
@@ -223,42 +344,62 @@
         .risk-indicator {
             display: flex;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
+            gap: 10px;
         }
 
         .risk-badge {
-            padding: 4px 12px;
+            padding: 6px 12px;
             border-radius: 16px;
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
-            margin-right: 10px;
+            letter-spacing: 0.5px;
         }
 
-        .risk-low { background: #d4edda; color: #155724; }
-        .risk-medium { background: #fff3cd; color: #856404; }
-        .risk-high { background: #f8d7da; color: #721c24; }
+        .risk-low {
+            background: rgba(0, 200, 83, 0.1);
+            color: var(--success-green);
+            border: 1px solid var(--success-green);
+        }
+
+        .risk-medium {
+            background: rgba(255, 152, 0, 0.1);
+            color: var(--warning-orange);
+            border: 1px solid var(--warning-orange);
+        }
+
+        .risk-high {
+            background: rgba(211, 47, 47, 0.1);
+            color: var(--danger-red);
+            border: 1px solid var(--danger-red);
+        }
+
+        .risk-indicator span {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
 
         .summary-text {
             font-size: 13px;
-            line-height: 1.5;
-            color: #333;
-            margin-bottom: 12px;
+            line-height: 1.6;
+            color: var(--text-primary);
+            margin-bottom: 14px;
         }
 
-        .footer {
-            background: #f8f9fa;
-            padding: 10px;
-            text-align: center;
-            font-size: 10px;
-            color: #666;
-            border-top: 1px solid #e9ecef;
-        }
-
+        /* ================================
+   LOADING STATE
+   ================================ */
         .loading {
             display: none;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 32px;
             text-align: center;
-            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
         }
 
         .loading.show {
@@ -266,37 +407,138 @@
         }
 
         .spinner {
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #667eea;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-blue);
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
+            margin: 0 auto 12px;
+        }
+
+        .loading p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
+        /* ================================
+   ERROR MESSAGE
+   ================================ */
         .error-message {
             display: none;
-            background: #f8d7da;
-            color: #721c24;
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 12px;
-            font-size: 12px;
+            background: rgba(211, 47, 47, 0.05);
+            color: var(--danger-red);
+            padding: 14px;
+            border-radius: var(--border-radius);
+            margin-bottom: 16px;
+            font-size: 13px;
+            border: 1px solid var(--danger-red);
+            font-weight: 500;
         }
 
         .error-message.show {
             display: block;
         }
+
+        /* ================================
+   FOOTER
+   ================================ */
+        .footer {
+            background: var(--white);
+            padding: 14px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-light);
+            border-top: 1px solid var(--border-color);
+            font-weight: 500;
+        }
+
+        /* ================================
+   SCROLLBAR
+   ================================ */
+        .content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .content::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        .content::-webkit-scrollbar-thumb:hover {
+            background: var(--text-light);
+        }
+
+        /* ================================
+   RESPONSIVE DESIGN
+   ================================ */
+        @media (max-width: 450px) {
+            body {
+                width: 100vw;
+                max-width: 100vw;
+            }
+
+            .container {
+                padding: 0;
+            }
+
+            .card-buttons {
+                flex-direction: column;
+            }
+
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ================================
+   ACCESSIBILITY
+   ================================ */
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        button:focus,
+        select:focus {
+            outline: 2px solid var(--primary-blue);
+            outline-offset: 2px;
+        }
+
+        @media (prefers-contrast: high) {
+
+            .extension-card,
+            .unified-actions {
+                border: 2px solid var(--text-primary);
+            }
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
+        <!-- Header -->
         <div class="header">
             <div class="language-selector">
                 <select id="languageSelect">
@@ -316,49 +558,78 @@
                     <option value="de">🇩🇪 Deutsch</option>
                 </select>
             </div>
-            <h1>🛡️ <span data-translate="title">Privacy Protection Suite</span></h1>
-            <p data-translate="subtitle">Cookie Guard + Terms AI Extension</p>
-            <span class="language-indicator" id="currentLang">EN</span>
+
+            <div class="header-content">
+                <div class="header-icon">
+                    <img src="/node_modules/lucide-static/icons/shield-check.svg" alt="Shield">
+                </div>
+                <h1 data-translate="title">Privacy Protection Suite</h1>
+                <p data-translate="subtitle">Cookie Guard + Terms AI Extension</p>
+                <span class="language-indicator" id="currentLang">EN</span>
+            </div>
         </div>
 
+        <!-- Content -->
         <div class="content">
             <!-- Cookie Guard Extension -->
             <div class="extension-card" id="cookie-guard-card">
                 <div class="card-header">
-                    <div class="card-icon">🍪</div>
+                    <div class="card-icon">
+                        <img src="/node_modules/lucide-static/icons/cookie.svg" alt="Cookie">
+                    </div>
                     <div class="card-title" data-translate="cookie_guard_title">Cookie Guard</div>
                 </div>
                 <div class="card-description" data-translate="cookie_guard_desc">
                     Analyze and manage cookies on this page with AI-powered classification and privacy protection.
                 </div>
                 <div class="card-buttons">
-                    <button class="btn btn-primary" id="open-cookie-guard" data-translate="open_cookie_guard">Open Cookie Guard</button>
-                    <button class="btn btn-secondary" id="scan-cookies" data-translate="quick_scan">Quick Scan</button>
+                    <button class="btn btn-primary" id="open-cookie-guard">
+                        <img src="/node_modules/lucide-static/icons/external-link.svg" alt="">
+                        <span data-translate="open_cookie_guard">Open Cookie Guard</span>
+                    </button>
+                    <button class="btn btn-secondary" id="scan-cookies">
+                        <img src="/node_modules/lucide-static/icons/scan.svg" alt="">
+                        <span data-translate="quick_scan">Quick Scan</span>
+                    </button>
                 </div>
             </div>
 
             <!-- Terms AI Extension -->
             <div class="extension-card" id="terms-ai-card">
                 <div class="card-header">
-                    <div class="card-icon">📋</div>
+                    <div class="card-icon">
+                        <img src="/node_modules/lucide-static/icons/file-text.svg" alt="Document">
+                    </div>
                     <div class="card-title" data-translate="terms_ai_title">Terms AI</div>
                 </div>
                 <div class="card-description" data-translate="terms_ai_desc">
                     AI-powered analysis of Terms & Conditions with smart summarization and risk assessment.
                 </div>
                 <div class="card-buttons">
-                    <button class="btn btn-primary" id="open-terms-ai" data-translate="open_terms_ai">Open Terms AI</button>
-                    <button class="btn btn-secondary" id="analyze-terms" data-translate="quick_analysis">Quick Analysis</button>
+                    <button class="btn btn-primary" id="open-terms-ai">
+                        <img src="/node_modules/lucide-static/icons/external-link.svg" alt="">
+                        <span data-translate="open_terms_ai">Open Terms AI</span>
+                    </button>
+                    <button class="btn btn-secondary" id="analyze-terms">
+                        <img src="/node_modules/lucide-static/icons/search.svg" alt="">
+                        <span data-translate="quick_analysis">Quick Analysis</span>
+                    </button>
                 </div>
             </div>
 
             <!-- Unified Actions -->
             <div class="unified-actions">
-                <h3>🚀 <span data-translate="combined_actions">Combined Actions</span></h3>
+                <h3>
+                    <img src="/node_modules/lucide-static/icons/zap.svg" alt="">
+                    <span data-translate="combined_actions">Combined Actions</span>
+                </h3>
                 <div class="card-buttons">
-                    <button class="btn btn-primary" id="full-analysis" data-translate="full_privacy_analysis">Full Privacy Analysis</button>
+                    <button class="btn btn-primary" id="full-analysis">
+                        <img src="/node_modules/lucide-static/icons/shield-check.svg" alt="">
+                        <span data-translate="full_privacy_analysis">Full Privacy Analysis</span>
+                    </button>
                 </div>
-                
+
                 <div class="status-grid">
                     <div class="status-item">
                         <div class="status-label" data-translate="cookies">Cookies</div>
@@ -374,14 +645,17 @@
             <!-- Analysis Results -->
             <div class="analysis-result" id="analysisResult">
                 <div class="risk-indicator">
-                    <div class="risk-badge" id="riskBadge">LOW</div>
+                    <div class="risk-badge risk-low" id="riskBadge">LOW</div>
                     <span data-translate="risk_level">Risk Level</span>
                 </div>
                 <div class="summary-text" id="summaryText">
                     Analysis results will appear here...
                 </div>
                 <div class="card-buttons">
-                    <button class="btn btn-secondary" id="view-details" data-translate="view_details">View Details</button>
+                    <button class="btn btn-secondary" id="view-details">
+                        <img src="/node_modules/lucide-static/icons/eye.svg" alt="">
+                        <span data-translate="view_details">View Details</span>
+                    </button>
                 </div>
             </div>
 
@@ -397,6 +671,7 @@
             </div>
         </div>
 
+        <!-- Footer -->
         <div class="footer">
             <span data-translate="footer_text">Cookie Guard + Terms AI • Privacy Protection Suite</span>
         </div>
@@ -404,4 +679,5 @@
 
     <script src="popup-multilingual.js"></script>
 </body>
+
 </html>

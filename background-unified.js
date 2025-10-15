@@ -3,6 +3,9 @@
 
 console.log('🚀 Unified Extension: Cookie Guard + Terms AI loaded');
 
+// Backend Configuration
+const BACKEND_URL = 'http://localhost:8000';
+
 // Cookie Guard Variables and Initialization
 let cookiePredictionMap = null;
 
@@ -395,7 +398,6 @@ async function handleCookieGuard(request, sender, sendResponse) {
 // Terms AI functionality (copied from working extension)
 let isProcessing = false;
 let analysisCache = new Map();
-const BACKEND_URL = 'http://localhost:8000';
 
 async function handleTermsAI(request, sender, sendResponse) {
     switch (request.action) {
@@ -409,13 +411,13 @@ async function handleTermsAI(request, sender, sendResponse) {
             try {
                 console.log('🤖 Starting Terms AI analysis...');
                 
-                const response = await fetch('http://localhost:8000/analyze', {
+                const response = await fetch(`${BACKEND_URL}/analyze_text`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        content: request.text,
+                        text: request.text,
                         language: 'en'
                     })
                 });
@@ -426,11 +428,8 @@ async function handleTermsAI(request, sender, sendResponse) {
                 
                 const result = await response.json();
                 
-                if (result.success) {
-                    sendResponse({ success: true, analysis: result.data });
-                } else {
-                    throw new Error(result.error || 'Backend analysis failed');
-                }
+                // Backend returns data directly
+                sendResponse({ success: true, analysis: result });
                 
             } catch (error) {
                 console.error('❌ Terms AI analysis failed:', error);
@@ -445,13 +444,13 @@ async function handleTermsAI(request, sender, sendResponse) {
             
         case 'quickSummary':
             try {
-                const response = await fetch('http://localhost:8000/analyze', {
+                const response = await fetch(`${BACKEND_URL}/analyze_text`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        content: request.text,
+                        text: request.text,
                         language: 'en'
                     })
                 });
@@ -462,11 +461,8 @@ async function handleTermsAI(request, sender, sendResponse) {
                 
                 const result = await response.json();
                 
-                if (result.success) {
-                    sendResponse({ success: true, summary: result.data });
-                } else {
-                    throw new Error(result.error || 'Backend analysis failed');
-                }
+                // Backend returns data directly
+                sendResponse({ success: true, summary: result });
                 
             } catch (error) {
                 sendResponse({ 
@@ -553,12 +549,12 @@ async function handleTermsAI(request, sender, sendResponse) {
             
         case 'check_backend_status':
             try {
-                const response = await fetch('http://localhost:8000/', {
+                const response = await fetch(`${BACKEND_URL}/`, {
                     method: 'GET'
                 });
                 
                 if (response.ok) {
-                    sendResponse({ success: true, status: 'connected', backend_url: 'http://localhost:8000' });
+                    sendResponse({ success: true, status: 'connected', backend_url: BACKEND_URL });
                 } else {
                     sendResponse({ success: false, status: 'error', error: 'Backend not responding' });
                 }
@@ -566,7 +562,7 @@ async function handleTermsAI(request, sender, sendResponse) {
                 sendResponse({ 
                     success: false, 
                     status: 'disconnected', 
-                    error: `Cannot connect to backend at http://localhost:8000. Please start your FastAPI server.`
+                    error: `Cannot connect to backend at ${BACKEND_URL}. Please start your FastAPI server.`
                 });
             }
             break;
@@ -646,13 +642,13 @@ async function analyzeWithBackend(content, language = 'en') {
     try {
         console.log('🔗 Calling FastAPI backend...');
         
-        const response = await fetch(`${BACKEND_URL}/analyze`, {
+        const response = await fetch(`${BACKEND_URL}/analyze_text`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ 
-                content: content,
+                text: content,
                 language: language 
             })
         });
@@ -664,11 +660,8 @@ async function analyzeWithBackend(content, language = 'en') {
         const result = await response.json();
         console.log('✅ Backend response received');
         
-        if (result.success) {
-            return { success: true, data: result.data };
-        } else {
-            throw new Error(result.error || 'Backend analysis failed');
-        }
+        // Backend returns data directly, not wrapped in success field
+        return { success: true, data: result };
 
     } catch (error) {
         console.error('🚨 Backend communication error:', error);

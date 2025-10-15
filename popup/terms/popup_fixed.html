@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,7 +26,7 @@
             margin: 8px;
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
             min-height: 634px;
         }
 
@@ -45,13 +46,20 @@
             right: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
             animation: shimmer 3s ease-in-out infinite;
         }
 
         @keyframes shimmer {
-            0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+
+            0%,
+            100% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+
+            50% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
         }
 
         .header h1 {
@@ -188,8 +196,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .results {
@@ -204,7 +217,7 @@
             margin-bottom: 20px;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             border: 1px solid #e9ecef;
         }
 
@@ -257,8 +270,15 @@
         }
 
         @keyframes riskCircleAnimation {
-            from { transform: rotate(-90deg) scale(0.5); opacity: 0; }
-            to { transform: rotate(0deg) scale(1); opacity: 1; }
+            from {
+                transform: rotate(-90deg) scale(0.5);
+                opacity: 0;
+            }
+
+            to {
+                transform: rotate(0deg) scale(1);
+                opacity: 1;
+            }
         }
 
         .risk-circle::before {
@@ -292,10 +312,25 @@
             margin-bottom: 8px;
         }
 
-        .risk-very-low { background: #d4edda; color: #155724; }
-        .risk-low { background: #cce5ff; color: #004085; }
-        .risk-medium { background: #fff3cd; color: #856404; }
-        .risk-high { background: #f8d7da; color: #721c24; }
+        .risk-very-low {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .risk-low {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .risk-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .risk-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
 
         .risk-description {
             font-size: 13px;
@@ -332,14 +367,31 @@
             transform: translateX(-20px);
         }
 
-        .key-point:nth-child(1) { animation-delay: 0.1s; }
-        .key-point:nth-child(2) { animation-delay: 0.2s; }
-        .key-point:nth-child(3) { animation-delay: 0.3s; }
-        .key-point:nth-child(4) { animation-delay: 0.4s; }
-        .key-point:nth-child(5) { animation-delay: 0.5s; }
+        .key-point:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .key-point:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .key-point:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .key-point:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .key-point:nth-child(5) {
+            animation-delay: 0.5s;
+        }
 
         @keyframes slideInLeft {
-            to { opacity: 1; transform: translateX(0); }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         .key-point::before {
@@ -426,12 +478,23 @@
             transform: translateY(10px);
         }
 
-        .clause-item:nth-child(1) { animation-delay: 0.1s; }
-        .clause-item:nth-child(2) { animation-delay: 0.2s; }
-        .clause-item:nth-child(3) { animation-delay: 0.3s; }
+        .clause-item:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .clause-item:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .clause-item:nth-child(3) {
+            animation-delay: 0.3s;
+        }
 
         @keyframes fadeInUp {
-            to { opacity: 1; transform: translateY(0); }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .clause-type {
@@ -505,7 +568,9 @@
             display: none;
         }
 
-        .error.show { display: block; }
+        .error.show {
+            display: block;
+        }
 
         .footer {
             padding: 16px;
@@ -520,7 +585,7 @@
             margin-bottom: 12px;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             border: 1px solid #e9ecef;
         }
 
@@ -603,9 +668,20 @@
             transition: all 0.2s ease;
         }
 
-        .heatmap-low { background: #d4edda; color: #155724; }
-        .heatmap-medium { background: #fff3cd; color: #856404; }
-        .heatmap-high { background: #f8d7da; color: #721c24; }
+        .heatmap-low {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .heatmap-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .heatmap-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
 
         .word-cloud-container {
             display: flex;
@@ -724,9 +800,26 @@
             margin: 16px 0;
         }
 
-        .text-safe { background: #d4edda; color: #155724; padding: 2px 4px; border-radius: 3px; }
-        .text-caution { background: #fff3cd; color: #856404; padding: 2px 4px; border-radius: 3px; }
-        .text-danger { background: #f8d7da; color: #721c24; padding: 2px 4px; border-radius: 3px; }
+        .text-safe {
+            background: #d4edda;
+            color: #155724;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .text-caution {
+            background: #fff3cd;
+            color: #856404;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .text-danger {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
 
         .enhanced-summary-grid {
             display: grid;
@@ -795,7 +888,7 @@
         .tab-btn.active {
             background: white;
             color: #667eea;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .tab-content {
@@ -833,27 +926,45 @@
         }
 
         @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         @keyframes slideOutRight {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
         }
 
         .notification {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
             <h1>🤖 T&C AI Analyzer</h1>
             <p>Smart • Visual • Multi-language</p>
         </div>
-
+        <button class="back-btn" id="backBtn-ai-analyzer">
+            <img src="/node_modules/lucide-static/icons/arrow-left.svg" alt="">
+            <span>Back to Home</span>
+        </button>
         <div class="content scrollbar-thin">
             <!-- Language Selection -->
             <div class="language-selector">
@@ -1178,4 +1289,5 @@
     <script src="popup_fixed.js"></script>
     <script src="chart.min.js"></script>
 </body>
+
 </html>

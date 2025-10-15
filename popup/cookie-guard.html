@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Guard - Privacy Protection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./cookie-guard.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header with Back Navigation -->
+        <div class="header">
+            <button class="back-btn" id="backBtn">
+                <img src="/node_modules/lucide-static/icons/arrow-left.svg" alt="">
+                <span>Back to Home</span>
+            </button>
+            <h1>Cookie Guard</h1>
+            <div class="header-stats">
+                <div class="stat-item">
+                    <span class="stat-number" id="totalCookies">0</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="essentialCookies">0</span>
+                    <span class="stat-label">Essential</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="trackingCookies">0</span>
+                    <span class="stat-label">Tracking</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cookie Statistics -->
+        <div class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card low-risk">
+                    <img src="/node_modules/lucide-static/icons/check.svg" alt="">
+                    <div class="stat-info">
+                        <div class="stat-value" id="lowRiskCount">0</div>
+                        <div class="stat-title">Low Risk</div>
+                    </div>
+                </div>
+                <div class="stat-card medium-risk">
+                    <img src="/node_modules/lucide-static/icons/alert-triangle.svg" alt="">
+                    <div class="stat-info">
+                        <div class="stat-value" id="mediumRiskCount">0</div>
+                        <div class="stat-title">Medium Risk</div>
+                    </div>
+                </div>
+                <div class="stat-card high-risk">
+                    <img src="/node_modules/lucide-static/icons/alert-circle.svg" alt="">
+                    <div class="stat-info">
+                        <div class="stat-value" id="highRiskCount">0</div>
+                        <div class="stat-title">High Risk</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-accept-essential" id="acceptEssentialBtn">
+                <img src="/node_modules/lucide-static/icons/shield.svg" alt="">
+                <span>Essential Only</span>
+            </button>
+            <button class="btn btn-accept-all" id="acceptAllBtn">
+                <img src="/node_modules/lucide-static/icons/check.svg" alt="">
+                <span>Accept All</span>
+            </button>
+        </div>
+
+        <!-- Cookie List -->
+        <div class="cookie-list-container">
+            <div class="cookie-list-header">
+                <h3>Detected Cookies</h3>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="essential">Essential</button>
+                    <button class="filter-btn" data-filter="tracking">Tracking</button>
+                    <button class="filter-btn" data-filter="marketing">Marketing</button>
+                </div>
+            </div>
+
+            <div class="cookie-list" id="cookieList">
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <p>Analyzing cookies...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cookie Details Modal -->
+        <div class="modal" id="cookieModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalCookieName">Cookie Details</h3>
+                    <button class="close-btn" id="closeModal">
+                        <img src="/node_modules/lucide-static/icons/x.svg" alt="">
+                    </button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <!-- Cookie details will be populated here -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="modalCloseBtn">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="cookie-guard.js"></script>
+</body>
+
+</html>
